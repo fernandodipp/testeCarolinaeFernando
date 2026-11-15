@@ -98,7 +98,7 @@ img { display: block; max-width: 100%; }
    ========================================================= */
 /* Profundidade: com o mouse, a camada mais distante se move menos e a mais próxima, mais.
    --px e --py vão de -1 a 1 e são definidos pelo JavaScript. */
-.fundo, .luzes, .palco {
+.profundidade .fundo, .profundidade .luzes, .profundidade .palco {
   translate: calc(var(--px, 0) * var(--prof) * -1px) calc(var(--py, 0) * var(--prof) * -1px);
   transition: translate 700ms var(--ease-out);
 }
@@ -107,7 +107,7 @@ img { display: block; max-width: 100%; }
 .palco { --prof: 16; }
 .fundo {
   position: fixed; inset: -12%;
-  background: url("convite.jpg?v=2026-11-15-6") center / cover;
+  background: url("convite.jpg?v=2026-11-15-8") center / cover;
   filter: blur(38px) saturate(1.15) brightness(.97);
   transform: scale(1.1);
 }
@@ -161,7 +161,7 @@ img { display: block; max-width: 100%; }
 }
 .js .palco:not(.abrindo) .sombra-env { animation: pousarSombra .95s both, sombraFlutuar 5.5s ease-in-out .95s infinite; }
 /* Na abertura, a sombra passa para o próprio envelope, que deixa de flutuar */
-.abrindo .sombra-env { opacity: 0; transition: opacity .4s var(--ease-out); }
+.abrindo .sombra-env { opacity: 0; transition: opacity .4s var(--ease-out), transform .4s var(--ease-out); }
 @keyframes sombraFlutuar {
   0%, 100% { transform: scale(var(--s, .8)) translate(0, 0); opacity: 1; }
   50% { transform: scale(calc(var(--s, .8) * 1.025)) translate(4px, 7px); opacity: .72; }
@@ -180,7 +180,8 @@ img { display: block; max-width: 100%; }
   width: var(--cw); aspect-ratio: 941 / 1672;
   perspective: 1600px;
   transform: translateY(0) scale(var(--s, .8));
-  transition: transform 1.3s var(--mola);
+  /* câmera: parte devagar e chega devagar, sem tranco no primeiro quadro */
+  transition: transform 1.3s cubic-bezier(.45, 0, .2, 1);
 }
 /* Enquanto o convite sai do envelope, a câmera recua para os dois caberem na tela */
 .puxando:not(.revelado) .cena { transform: translateY(28%) scale(.58); }
@@ -214,7 +215,7 @@ img { display: block; max-width: 100%; }
 .env-costas, .env-bolso, .env-aba {
   background-image:
     var(--tom),
-    url("papel-envelope.webp?v=2026-11-15-6");
+    url("papel-envelope.webp?v=2026-11-15-8");
   background-size: 100% 100%, calc(var(--cw) * .2125) calc(var(--cw) * .2125);
   background-position: 0 0, 0 0;
 }
@@ -230,9 +231,9 @@ img { display: block; max-width: 100%; }
 .env-costas::after {
   content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   box-shadow: 6px 40px 70px -30px rgb(var(--sombra) / .6);
-  opacity: 0; transition: opacity .4s var(--ease-out);
+  opacity: 0; visibility: hidden; transition: opacity .4s var(--ease-out);
 }
-.abrindo .env-costas::after { opacity: 1; }
+.abrindo .env-costas::after { opacity: 1; visibility: visible; }
 .env-bolso {
   z-index: 3; border-radius: 6px;
   --tom: linear-gradient(100deg, rgba(205,165,135,.2), rgba(255,248,240,.08) 50%, rgba(205,165,135,.2));
@@ -262,14 +263,15 @@ img { display: block; max-width: 100%; }
 /* Sombra própria da aba: escurece ao ficar de lado para a luz e clareia ao deitar */
 .env-aba::before {
   content: ""; position: absolute; inset: 0; z-index: 1;
-  background: rgb(110 80 58); opacity: 0; pointer-events: none;
+  background: rgb(110 80 58); opacity: 0; pointer-events: none; visibility: hidden;
 }
+.abrindo .env-aba::before { visibility: visible; }
 /* Verso da aba: o mesmo papel, levemente sombreado como o lado de dentro */
 .env-aba::after {
   content: ""; position: absolute; inset: 0;
   background:
     linear-gradient(180deg, rgba(150,108,80,.2), rgba(150,108,80,.06) 55%, rgba(255,246,236,.12)),
-    url("papel-envelope.webp?v=2026-11-15-6") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
+    url("papel-envelope.webp?v=2026-11-15-8") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
   opacity: 0; transition: opacity 0s .79s;
 }
 .abrindo .env-aba::after { opacity: 1; }
@@ -279,10 +281,14 @@ img { display: block; max-width: 100%; }
   z-index: 0; filter: drop-shadow(0 -2px 4px rgb(var(--sombra) / .2));
 }
 .abrindo .env-aba::before { animation: abaSombra 1.1s .3s both; }
+/* A queda é outra animação, que começa onde a abertura terminou (trocar animação por transição faria a aba saltar) */
 .revelado .env-aba {
-  animation: none;
   transform: translateY(120vh) rotate(4deg) rotateX(180deg);
-  transition: transform .95s cubic-bezier(.5, 0, .9, .5);
+  animation: abaCai .95s cubic-bezier(.5, 0, .9, .5) both;
+}
+@keyframes abaCai {
+  from { transform: translateY(0) rotate(0) rotateX(180deg); }
+  to   { transform: translateY(120vh) rotate(4deg) rotateX(180deg); }
 }
 /* Erguida pela mão até a vertical (desacelera); depois cai pelo próprio peso (acelera) e quica de leve */
 @keyframes abaAbrir {
@@ -310,7 +316,7 @@ img { display: block; max-width: 100%; }
   border-radius: 50%;
   touch-action: manipulation;
   /* selo de cera em relevo: aro alto de cera empurrada e marca do carimbo rebaixada */
-  background: url("selo.webp?v=2026-11-15-6") center / contain no-repeat;
+  background: url("selo.webp?v=2026-11-15-8") center / contain no-repeat;
   filter: drop-shadow(3px 9px 10px rgba(40,46,34,.38)) drop-shadow(1px 2px 2px rgba(40,46,34,.35));
   transition: transform var(--dur-slow) var(--spring-soft), opacity .6s var(--ease-in);
 }
@@ -331,15 +337,15 @@ img { display: block; max-width: 100%; }
   position: absolute; left: 31.5%; top: 36.21%; z-index: 5;
   width: 37%; aspect-ratio: 440 / 435;
   filter: drop-shadow(3px 9px 10px rgba(40,46,34,.38)) drop-shadow(1px 2px 2px rgba(40,46,34,.35));
-  opacity: 0; pointer-events: none;
+  opacity: 0; pointer-events: none; visibility: hidden;
 }
 .selo-meia::before {
   content: ""; position: absolute; inset: 0;
-  background: url("selo.webp?v=2026-11-15-6") center / contain no-repeat;
+  background: url("selo.webp?v=2026-11-15-8") center / contain no-repeat;
 }
 .selo-cima::before { clip-path: polygon(0 0, 100% 0, 100% 50%, 86% 54%, 72% 47%, 57% 55%, 43% 47%, 29% 54%, 15% 47%, 0 52%); }
 .selo-baixo::before { clip-path: polygon(0 52%, 15% 47%, 29% 54%, 43% 47%, 57% 55%, 72% 47%, 86% 54%, 100% 50%, 100% 100%, 0 100%); }
-.abrindo .selo-meia { opacity: 1; }
+.abrindo .selo-meia { opacity: 1; visibility: visible; }
 /* A metade de cima está colada na aba: gira em torno da mesma dobra e some quando fica de costas */
 .selo-cima {
   transform-origin: 50% -188%;
@@ -359,7 +365,9 @@ img { display: block; max-width: 100%; }
 /* =========================================================
    Brinde de espumante: as taças se tocam sobre o selo
    ========================================================= */
-.brinde { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
+.brinde { position: absolute; inset: 0; z-index: 8; pointer-events: none; visibility: hidden; }
+/* As camadas de cada etapa só são desenhadas na vez delas: escondidas, não pesam enquanto o envelope flutua */
+.brindando:not(.puxando) .brinde { visibility: visible; }
 .taca {
   position: absolute; bottom: 40%;
   width: 26%; aspect-ratio: 60 / 200;
@@ -391,7 +399,7 @@ img { display: block; max-width: 100%; }
   60%   { transform: translate(-3.4%, 0) rotate(8.8deg);  animation-timing-function: cubic-bezier(.4, 0, .3, 1); }
   72%   { transform: translate(-3.6%, -11%) rotate(8.2deg); animation-timing-function: ease-in-out; }
   80%   { transform: translate(-4%, -12%) rotate(7.8deg); animation-timing-function: cubic-bezier(.55, 0, .8, .6); }
-  92%   { opacity: 1; }
+  84%   { opacity: 1; }
   100%  { opacity: 0; transform: translate(-240%, -2%) rotate(-5deg); }
 }
 @keyframes brindeDir {
@@ -407,7 +415,7 @@ img { display: block; max-width: 100%; }
   60%   { transform: translate(3.4%, 0) rotate(-8.8deg);  animation-timing-function: cubic-bezier(.4, 0, .3, 1); }
   72%   { transform: translate(3.6%, -11%) rotate(-8.2deg); animation-timing-function: ease-in-out; }
   80%   { transform: translate(4%, -12%) rotate(-7.8deg); animation-timing-function: cubic-bezier(.55, 0, .8, .6); }
-  92%   { opacity: 1; }
+  84%   { opacity: 1; }
   100%  { opacity: 0; transform: translate(240%, -2%) rotate(5deg); }
 }
 /* Espumante: compensa a inclinação da taça (fica na horizontal) e, por inércia,
@@ -455,7 +463,7 @@ img { display: block; max-width: 100%; }
   position: absolute; inset: 0; z-index: 2;
   container-type: inline-size;
   border-radius: 4px; overflow: hidden;
-  background: var(--superficie) url("convite.webp?v=2026-11-15-6") center / cover;
+  background: var(--superficie) url("convite.webp?v=2026-11-15-8") center / cover;
   box-shadow: var(--elev-1);
   transform: translateY(0) rotate(0) scale(.94);
 }
@@ -471,13 +479,20 @@ img { display: block; max-width: 100%; }
   75%  { transform: translateY(-86%) rotate(-1.4deg) scale(.94);   animation-timing-function: cubic-bezier(.2, .6, .4, 1); }
   100% { transform: translateY(-104%) rotate(-.8deg) scale(.94); }
 }
-/* Livre do envelope, o convite desce para o centro e assenta com um rebote leve */
+/* Livre do envelope, o convite desce para o centro e assenta com um rebote leve.
+   É uma animação que começa onde a saída terminou (trocar animação por transição faria o convite saltar) */
 .revelado .convite {
-  z-index: 6; animation: none;
+  z-index: 6;
   transform: translateY(0) rotate(0) scale(1);
-  transition: transform 1.2s cubic-bezier(.3, 1.12, .45, 1);
+  /* parte devagar, acelera na descida e passa um pouco do ponto antes de assentar */
+  animation: assentar 1.2s cubic-bezier(.5, 0, .3, 1.12) both;
+}
+@keyframes assentar {
+  from { transform: translateY(-104%) rotate(-.8deg) scale(.94); }
+  to   { transform: translateY(0) rotate(0) scale(1); }
 }
 .pronto .convite {
+  animation: none;
   transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   transition: transform var(--dur-slow) var(--ease-out);
 }
@@ -488,9 +503,9 @@ img { display: block; max-width: 100%; }
   box-shadow: var(--elev-convite);
   /* a luz é fixa: quando o convite inclina, a sombra vai para o lado oposto ao do mouse */
   transform: translate(var(--sx, 0px), var(--sy, 0px));
-  opacity: 0; transition: opacity 1s var(--ease-out), transform var(--dur-slow) var(--ease-out);
+  opacity: 0; visibility: hidden; transition: opacity 1s var(--ease-out), transform var(--dur-slow) var(--ease-out);
 }
-.revelado .cena::after { opacity: 1; }
+.revelado .cena::after { opacity: 1; visibility: visible; }
 /* Brilho que atravessa o convite uma vez, e reflexo que segue o mouse */
 .convite::before, .convite::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3; }
 .convite::before {
@@ -616,11 +631,7 @@ img { display: block; max-width: 100%; }
   --vidro-hover: rgb(228 207 189 / .96);
   background-color: var(--vidro);
   /* reflexo do céu no alto à esquerda (lado da luz) e espessura escura embaixo à direita */
-  /* granulado fino de vidro jateado + reflexo do céu no alto à esquerda (lado da luz) e espessura escura embaixo à direita */
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 -.18'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23g)'/%3E%3C/svg%3E"),
-    linear-gradient(140deg, rgb(255 255 255 / .55) 0%, rgb(255 255 255 / .12) 42%, transparent 60%, rgb(var(--sombra) / .10) 100%);
-  background-size: 48px 48px, 100% 100%;
+  background-image: linear-gradient(140deg, rgb(255 255 255 / .55) 0%, rgb(255 255 255 / .12) 42%, transparent 60%, rgb(var(--sombra) / .10) 100%);
   border: 1px solid rgb(255 255 255 / .7);
   color: var(--texto-suave);
   /* vidro: sombra leve e curta; borda clara por dentro, do lado da luz */
@@ -631,7 +642,9 @@ img { display: block; max-width: 100%; }
   transition: transform var(--dur-base) var(--spring-snappy), background-color var(--dur-base) var(--ease-out);
 }
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .botao-icone {
+  /* O desfoque só liga quando os botões aparecem. Antes, escondidos no envelope que flutua,
+     eles recalculariam o desfoque a cada quadro sem ninguém ver (custava cerca de 15 quadros/s) */
+  .pronto .botao-icone {
     --vidro: rgb(214 186 162 / .30);
     --vidro-hover: rgb(190 156 130 / .40);
     -webkit-backdrop-filter: blur(10px) saturate(1.5);
@@ -639,8 +652,15 @@ img { display: block; max-width: 100%; }
   }
   /* No celular, desfoque menor: custa menos para desenhar */
   @media (max-width: 600px) {
-    .botao-icone { -webkit-backdrop-filter: blur(6px) saturate(1.5); backdrop-filter: blur(6px) saturate(1.5); }
+    .pronto .botao-icone { -webkit-backdrop-filter: blur(6px) saturate(1.5); backdrop-filter: blur(6px) saturate(1.5); }
   }
+}
+/* Granulado fino de vidro jateado: só quando os botões aparecem */
+.pronto .botao-icone {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 -.18'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23g)'/%3E%3C/svg%3E"),
+    linear-gradient(140deg, rgb(255 255 255 / .55) 0%, rgb(255 255 255 / .12) 42%, transparent 60%, rgb(var(--sombra) / .10) 100%);
+  background-size: 48px 48px, 100% 100%;
 }
 /* Sombra de elevação do botão: fica numa camada própria e só a opacidade anima */
 .botao::before {
@@ -700,7 +720,7 @@ html:not(.js) .convite { transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .luzes span, .dica, .botao-icone::after, .bolhas circle, .convite::before { animation: none !important; }
   .js .palco:not(.abrindo) .cena, .js .palco:not(.abrindo) .sombra-env { animation: none; }
-  .fundo, .luzes, .palco { translate: none; }
+  .profundidade .fundo, .profundidade .luzes, .profundidade .palco { translate: none; }
 }
 
 /* Mais contraste, quando o sistema pede */

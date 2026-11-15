@@ -151,6 +151,21 @@
     } catch (e) { /* sem som */ }
   }
 
+  var sombraEnv = document.querySelector(".sombra-env");
+  /* Fixa o valor atual de uma animação no próprio elemento. Ao remover a animação,
+     o navegador saltaria para o valor final; assim a transição parte de onde ele estava.
+     Devolve a função que solta o elemento para a transição começar. */
+  function congelar(el, props) {
+    var atual = getComputedStyle(el), valores = {};
+    props.forEach(function (p) { valores[p] = atual[p]; });
+    el.style.transition = "none";
+    props.forEach(function (p) { el.style[p] = valores[p]; });
+    return function () {
+      el.style.transition = "";
+      props.forEach(function (p) { el.style[p] = ""; });
+    };
+  }
+
   var TOQUE = 930;    // momento em que as bordas das taças se tocam (ms)
   var RACHA = 120;    // o selo racha logo depois do tilintar
   /* Ponto de encontro das bordas: no centro da cena, a cerca de 13,8% da altura (ver .taca no CSS) */
@@ -172,7 +187,13 @@
     }, TOQUE);
 
     /* 2. O selo racha e a aba abre */
-    setTimeout(function () { palco.classList.add("abrindo"); }, TOQUE + RACHA);
+    setTimeout(function () {
+      /* A flutuação para aqui. O envelope e a sombra ficam presos no ponto em que estavam
+         e, no quadro seguinte, assentam por transição, sem tranco */
+      var soltar = [congelar(cena, ["transform"]), congelar(sombraEnv, ["transform", "opacity"])];
+      palco.classList.add("abrindo");
+      requestAnimationFrame(function () { soltar.forEach(function (f) { f(); }); });
+    }, TOQUE + RACHA);
 
     /* 3. O convite sai do envelope e o envelope cai */
     setTimeout(function () { palco.classList.add("puxando"); }, TOQUE + RACHA + 1450);
@@ -242,6 +263,7 @@
     /* ---------- Profundidade: as camadas se movem com o mouse (ver .fundo, .luzes e .palco no CSS) ---------- */
     var raiz = document.documentElement, mx = 0, my = 0, pendente = false;
     function aplicarProfundidade() {
+      raiz.classList.add("profundidade");  // liga o efeito só depois que o mouse se mexe
       raiz.style.setProperty("--px", mx.toFixed(3));
       raiz.style.setProperty("--py", my.toFixed(3));
       pendente = false;
