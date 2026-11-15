@@ -74,7 +74,7 @@ img { display: block; max-width: 100%; }
    ========================================================= */
 .fundo {
   position: fixed; inset: -12%;
-  background: url("convite.jpg?v=2026-11-15-2") center / cover;
+  background: url("convite.jpg?v=2026-11-15-3") center / cover;
   filter: blur(38px) saturate(1.15) brightness(.97);
   transform: scale(1.1);
 }
@@ -146,7 +146,7 @@ img { display: block; max-width: 100%; }
 .env-costas, .env-bolso, .env-aba {
   background-image:
     var(--tom),
-    url("papel-envelope.webp?v=2026-11-15-2");
+    url("papel-envelope.webp?v=2026-11-15-3");
   background-size: 100% 100%, calc(var(--cw) * .2125) calc(var(--cw) * .2125);
   background-position: 0 0, 0 0;
 }
@@ -188,7 +188,7 @@ img { display: block; max-width: 100%; }
   content: ""; position: absolute; inset: 0;
   background:
     linear-gradient(180deg, rgba(150,108,80,.2), rgba(150,108,80,.06) 55%, rgba(255,246,236,.12)),
-    url("papel-envelope.webp?v=2026-11-15-2") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
+    url("papel-envelope.webp?v=2026-11-15-3") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
   opacity: 0; transition: opacity 0s .78s;
 }
 .abrindo .env-aba::after { opacity: 1; }
@@ -203,7 +203,7 @@ img { display: block; max-width: 100%; }
   border-radius: 50%;
   touch-action: manipulation;
   /* selo de cera em relevo: aro alto de cera empurrada e marca do carimbo rebaixada */
-  background: url("selo.webp?v=2026-11-15-2") center / contain no-repeat;
+  background: url("selo.webp?v=2026-11-15-3") center / contain no-repeat;
   filter: drop-shadow(3px 9px 10px rgba(40,46,34,.38)) drop-shadow(1px 2px 2px rgba(40,46,34,.35));
   transition: transform var(--dur-slow) var(--spring-soft), opacity .6s var(--ease-in);
 }
@@ -281,7 +281,7 @@ img { display: block; max-width: 100%; }
   position: absolute; inset: 0; z-index: 2;
   container-type: inline-size;
   border-radius: 4px; overflow: hidden;
-  background: var(--papel) url("convite.webp?v=2026-11-15-2") center / cover;
+  background: var(--papel) url("convite.webp?v=2026-11-15-3") center / cover;
   box-shadow: var(--elev-1);
   transform: translateY(0) scale(.94);
   transition: transform 1.15s cubic-bezier(.5, 0, .2, 1);
@@ -420,10 +420,32 @@ img { display: block; max-width: 100%; }
   position: relative; z-index: 1; overflow: hidden; isolation: isolate;
   display: grid; place-items: center;
   width: 12.5cqw; height: 12.5cqw; border-radius: 50%;
-  background: var(--cor-botao); color: #fff;
-  /* sombra de contato curta + realce no alto à esquerda, do lado da luz */
-  box-shadow: .3cqw 1.1cqw 2.4cqw -1.2cqw rgb(var(--sombra) / .7), inset 0 0 0 .5cqw rgba(255,255,255,.12), inset .35cqw .35cqw .5cqw rgba(255,255,255,.18);
+  /* Vidro fosco cor de bronze. Sem desfoque, a base é quase opaca, para o ícone continuar legível */
+  --vidro: rgb(240 226 212 / .94);
+  --vidro-hover: rgb(228 207 189 / .96);
+  background-color: var(--vidro);
+  /* reflexo do céu no alto à esquerda (lado da luz) e espessura escura embaixo à direita */
+  background-image: linear-gradient(140deg, rgb(255 255 255 / .55) 0%, rgb(255 255 255 / .12) 42%, transparent 60%, rgb(var(--sombra) / .10) 100%);
+  border: 1px solid rgb(255 255 255 / .7);
+  color: var(--bronze-escuro);
+  /* vidro: sombra leve e curta; borda clara por dentro, do lado da luz */
+  box-shadow:
+    .3cqw .9cqw 1.8cqw -.8cqw rgb(var(--sombra) / .45),
+    inset .3cqw .3cqw .4cqw rgb(255 255 255 / .55),
+    inset -.3cqw -.35cqw .6cqw rgb(var(--sombra) / .16);
   transition: transform var(--dur-base) var(--spring-snappy), background-color var(--dur-base) var(--ease-out);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .botao-icone {
+    --vidro: rgb(214 186 162 / .30);
+    --vidro-hover: rgb(190 156 130 / .40);
+    -webkit-backdrop-filter: blur(10px) saturate(1.5);
+    backdrop-filter: blur(10px) saturate(1.5);
+  }
+  /* No celular, desfoque menor: custa menos para desenhar */
+  @media (max-width: 600px) {
+    .botao-icone { -webkit-backdrop-filter: blur(6px) saturate(1.5); backdrop-filter: blur(6px) saturate(1.5); }
+  }
 }
 /* Sombra de elevação do botão: fica numa camada própria e só a opacidade anima */
 .botao::before {
@@ -457,11 +479,11 @@ img { display: block; max-width: 100%; }
   transition: color var(--dur-base) var(--ease-out);
 }
 @media (hover: hover) {
-  .botao:hover .botao-icone { background-color: var(--cor-botao-escura); transform: translateY(-.6cqw) scale(1.04); }
+  .botao:hover .botao-icone { background-color: var(--vidro-hover); transform: translateY(-.6cqw) scale(1.04); }
   .botao:hover::before { opacity: 1; transform: translateY(-.6cqw) scale(1.04); }
   .botao:hover .botao-legenda { color: var(--cor-botao-escura); }
 }
-.botao:focus-visible .botao-icone { background-color: var(--cor-botao-escura); transform: translateY(-.6cqw) scale(1.04); }
+.botao:focus-visible .botao-icone { background-color: var(--vidro-hover); transform: translateY(-.6cqw) scale(1.04); }
 .botao:focus-visible::before { opacity: 1; transform: translateY(-.6cqw) scale(1.04); }
 .botao:focus-visible .botao-legenda { color: var(--cor-botao-escura); }
 /* O contorno de foco fica no círculo, que é a parte visível do botão */
@@ -488,6 +510,8 @@ html:not(.js) .convite { transform: none; }
 /* Mais contraste, quando o sistema pede */
 @media (prefers-contrast: more) {
   :root { --cor-nomes: #8C6B55; --cor-data: #7E5E48; --cor-botao: #8C6B55; --cor-botao-escura: #6B4F3C; }
+  /* Com mais contraste, o vidro vira um botão sólido */
+  .botao-icone { --vidro: var(--cor-botao); --vidro-hover: var(--cor-botao-escura); color: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .t-acao { text-decoration-style: solid; }
 }
 /* Cores forçadas (alto contraste do Windows) */
