@@ -43,5 +43,5 @@ Ela só permite arquivos do próprio site. Por isso:
 
 ## Acessibilidade
 
-- Quem pede menos movimento no sistema vê a abertura do envelope em etapas curtas, sem animações.
+- Quem pede menos movimento no sistema continua vendo a abertura do envelope, mas sem os movimentos contínuos de fundo (luzes, flutuação, brilhos dos botões).
 - Data, endereço e botões têm área de toque de pelo menos 44 px e contorno visível ao navegar pelo teclado.

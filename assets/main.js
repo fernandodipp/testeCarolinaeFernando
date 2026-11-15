@@ -151,9 +151,8 @@
     } catch (e) { /* sem som */ }
   }
 
-  /* Com pouco movimento, a abertura acontece em etapas curtas, sem esperar animações que não serão vistas */
-  var ritmo = poucoMovimento ? .25 : 1;
-  var TOQUE = 930 * ritmo;  // momento em que as taças se encontram (ms)
+  var ritmo = 1;
+  var TOQUE = 930;  // momento em que as taças se encontram (ms)
   function abrir() {
     if (aberto) return;
     aberto = true;

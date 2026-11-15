@@ -74,7 +74,7 @@ img { display: block; max-width: 100%; }
    ========================================================= */
 .fundo {
   position: fixed; inset: -12%;
-  background: url("convite.jpg?v=2026-11-15-1") center / cover;
+  background: url("convite.jpg?v=2026-11-15-2") center / cover;
   filter: blur(38px) saturate(1.15) brightness(.97);
   transform: scale(1.1);
 }
@@ -146,7 +146,7 @@ img { display: block; max-width: 100%; }
 .env-costas, .env-bolso, .env-aba {
   background-image:
     var(--tom),
-    url("papel-envelope.webp?v=2026-11-15-1");
+    url("papel-envelope.webp?v=2026-11-15-2");
   background-size: 100% 100%, calc(var(--cw) * .2125) calc(var(--cw) * .2125);
   background-position: 0 0, 0 0;
 }
@@ -188,7 +188,7 @@ img { display: block; max-width: 100%; }
   content: ""; position: absolute; inset: 0;
   background:
     linear-gradient(180deg, rgba(150,108,80,.2), rgba(150,108,80,.06) 55%, rgba(255,246,236,.12)),
-    url("papel-envelope.webp?v=2026-11-15-1") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
+    url("papel-envelope.webp?v=2026-11-15-2") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
   opacity: 0; transition: opacity 0s .78s;
 }
 .abrindo .env-aba::after { opacity: 1; }
@@ -203,7 +203,7 @@ img { display: block; max-width: 100%; }
   border-radius: 50%;
   touch-action: manipulation;
   /* selo de cera em relevo: aro alto de cera empurrada e marca do carimbo rebaixada */
-  background: url("selo.webp?v=2026-11-15-1") center / contain no-repeat;
+  background: url("selo.webp?v=2026-11-15-2") center / contain no-repeat;
   filter: drop-shadow(3px 9px 10px rgba(40,46,34,.38)) drop-shadow(1px 2px 2px rgba(40,46,34,.35));
   transition: transform var(--dur-slow) var(--spring-soft), opacity .6s var(--ease-in);
 }
@@ -281,7 +281,7 @@ img { display: block; max-width: 100%; }
   position: absolute; inset: 0; z-index: 2;
   container-type: inline-size;
   border-radius: 4px; overflow: hidden;
-  background: var(--papel) url("convite.webp?v=2026-11-15-1") center / cover;
+  background: var(--papel) url("convite.webp?v=2026-11-15-2") center / cover;
   box-shadow: var(--elev-1);
   transform: translateY(0) scale(.94);
   transition: transform 1.15s cubic-bezier(.5, 0, .2, 1);
@@ -478,17 +478,11 @@ html:not(.js) .env, html:not(.js) .selo, html:not(.js) .dica, html:not(.js) .cha
 html:not(.js) .cena { transform: none; }
 html:not(.js) .convite { transform: none; }
 
-/* Pouco movimento: a abertura do envelope continua (ela só acontece com o clique),
-   mas os movimentos contínuos de fundo param. */
+/* Pouco movimento: a abertura do envelope continua animada, porque só acontece
+   quando a pessoa toca no selo. Param os movimentos contínuos e decorativos. */
 @media (prefers-reduced-motion: reduce) {
-  .luzes span, .dica, .botao-icone::after { animation: none !important; }
+  .luzes span, .dica, .botao-icone::after, .bolhas circle, .convite::before { animation: none !important; }
   .js .palco:not(.abrindo) .cena { animation: none; }
-  *, *::before, *::after {
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .01ms !important;
-    scroll-behavior: auto !important;
-  }
 }
 
 /* Mais contraste, quando o sistema pede */
