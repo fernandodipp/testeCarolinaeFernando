@@ -1,7 +1,16 @@
 /* =========================================================
+   Fontes hospedadas no próprio site (sem pedidos ao Google)
+   ========================================================= */
+@font-face { font-family: "Cinzel"; src: url("fontes/cinzel.woff2") format("woff2"); font-weight: 400 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Gilda Display"; src: url("fontes/gilda-display.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Montserrat"; src: url("fontes/montserrat.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Montserrat"; src: url("fontes/montserrat-italico.woff2") format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
+
+/* =========================================================
    Identidade visual
    ========================================================= */
 :root {
+  color-scheme: light;
   --oliva: #4E5A46;
   --salvia: #A9B5A0;
   --blush: #F2D7B8;
@@ -22,11 +31,30 @@
   --cor-texto: #3A3532;        /* convite e endereço: cinza-escuro do PDF (#333333) */
   --cor-botao: #B8977F;
   --cor-botao-escura: #9E7D66;
-  --mola: cubic-bezier(.2, .8, .2, 1);
+  --mola: cubic-bezier(.2, .8, .2, 1);   /* sequência de abertura do envelope */
+
+  /* Movimento das interações: duração e curva de acordo com a massa do objeto */
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 400ms;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-in: cubic-bezier(.64, 0, .78, 0);
+  --spring-soft:   linear(0, .2 6%, .62 14%, .95 24%, 1.07 34%, 1.06 42%, .99 58%, 1.01 72%, 1);
+  --spring-snappy: linear(0, .35 8%, .85 18%, 1.08 30%, 1.03 44%, .99 60%, 1);
+
+  /* Luz única no canto superior esquerdo: as sombras caem para baixo e para a direita,
+     sempre no tom bronze do papel */
+  --sombra: 122 90 65;
+  --elev-1: 1px 2px 6px rgb(var(--sombra) / .14);
+  --elev-convite: 8px 50px 90px -40px rgb(100 70 45 / .65), 3px 12px 30px -12px rgb(100 70 45 / .35);
 
   /* Largura do convite: cabe na tela com o envelope em volta */
   --cw: min(calc((100vw - 40px) / 1.14), calc(84vh * .5628));
   --cw: min(calc((100vw - 40px) / 1.14), calc(84svh * .5628), 520px);
+}
+/* Sem suporte a linear(): a mola vira uma curva suave, com a mesma duração */
+@supports not (transition-timing-function: linear(0, 1)) {
+  :root { --spring-soft: var(--ease-out); --spring-snappy: var(--ease-out); }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -46,7 +74,7 @@ img { display: block; max-width: 100%; }
    ========================================================= */
 .fundo {
   position: fixed; inset: -12%;
-  background: url("convite.jpg?v=2026-11-09-8") center / cover;
+  background: url("convite.jpg?v=2026-11-15-1") center / cover;
   filter: blur(38px) saturate(1.15) brightness(.97);
   transform: scale(1.1);
 }
@@ -81,7 +109,7 @@ img { display: block; max-width: 100%; }
   position: absolute; left: 0; right: 0; margin: 0; text-align: center;
   font-family: var(--sans); font-size: .68rem; letter-spacing: .32em; text-transform: uppercase;
   color: var(--bronze-escuro);
-  transition: opacity .6s, transform .6s var(--mola);
+  transition: opacity var(--dur-slow) var(--ease-in), transform var(--dur-slow) var(--ease-in);
 }
 .chamada { top: max(4vh, 18px); }
 .chamada::before, .chamada::after { content: "✦"; margin: 0 .8em; color: var(--ouro); font-size: .8em; }
@@ -118,7 +146,7 @@ img { display: block; max-width: 100%; }
 .env-costas, .env-bolso, .env-aba {
   background-image:
     var(--tom),
-    url("papel-envelope.webp?v=2026-11-09-8");
+    url("papel-envelope.webp?v=2026-11-15-1");
   background-size: 100% 100%, calc(var(--cw) * .2125) calc(var(--cw) * .2125);
   background-position: 0 0, 0 0;
 }
@@ -126,8 +154,8 @@ img { display: block; max-width: 100%; }
   z-index: 1; border-radius: 6px;
   --tom: linear-gradient(rgba(190,148,118,.22), rgba(190,148,118,.22));
   box-shadow:
-    0 40px 70px -30px rgba(122,90,65,.6),
-    0 8px 18px -8px rgba(122,90,65,.35),
+    6px 40px 70px -30px rgb(var(--sombra) / .6),
+    2px 8px 18px -8px rgb(var(--sombra) / .35),
     inset 0 0 40px rgba(154,117,86,.25);
 }
 .env-bolso {
@@ -152,7 +180,7 @@ img { display: block; max-width: 100%; }
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   border-radius: 6px 6px 0 0;
   transform-origin: 50% 0;
-  filter: drop-shadow(0 1px 1px rgba(122,90,65,.28)) drop-shadow(0 5px 7px rgba(122,90,65,.26));
+  filter: drop-shadow(1px 1px 1px rgb(var(--sombra) / .28)) drop-shadow(2px 5px 7px rgb(var(--sombra) / .26));
   transition: transform 1s cubic-bezier(.6, 0, .25, 1) .3s, z-index 0s .8s, filter 1s .3s, opacity .9s;
 }
 /* Verso da aba: o mesmo papel, levemente sombreado como o lado de dentro */
@@ -160,7 +188,7 @@ img { display: block; max-width: 100%; }
   content: ""; position: absolute; inset: 0;
   background:
     linear-gradient(180deg, rgba(150,108,80,.2), rgba(150,108,80,.06) 55%, rgba(255,246,236,.12)),
-    url("papel-envelope.webp?v=2026-11-09-8") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
+    url("papel-envelope.webp?v=2026-11-15-1") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
   opacity: 0; transition: opacity 0s .78s;
 }
 .abrindo .env-aba::after { opacity: 1; }
@@ -173,14 +201,22 @@ img { display: block; max-width: 100%; }
   transform: translate(-50%, -50%);
   border: 0; padding: 0; cursor: pointer;
   border-radius: 50%;
+  touch-action: manipulation;
   /* selo de cera em relevo: aro alto de cera empurrada e marca do carimbo rebaixada */
-  background: url("selo.webp?v=2026-11-09-8") center / contain no-repeat;
-  filter: drop-shadow(0 9px 10px rgba(40,46,34,.38)) drop-shadow(0 2px 2px rgba(40,46,34,.35));
-  transition: transform .7s var(--mola), opacity .6s;
+  background: url("selo.webp?v=2026-11-15-1") center / contain no-repeat;
+  filter: drop-shadow(3px 9px 10px rgba(40,46,34,.38)) drop-shadow(1px 2px 2px rgba(40,46,34,.35));
+  transition: transform var(--dur-slow) var(--spring-soft), opacity .6s var(--ease-in);
 }
-.selo:hover { transform: translate(-50%, -50%) scale(1.05) rotate(-3deg); }
-.selo:focus-visible { outline: 2px solid var(--bronze); outline-offset: 8px; }
-.abrindo .selo { transform: translate(-50%, -50%) scale(1.5) rotate(20deg); opacity: 0; pointer-events: none; }
+@media (hover: hover) {
+  .selo:hover { transform: translate(-50%, -50%) scale(1.05) rotate(-3deg); }
+}
+/* Ao pressionar, a cera desce em direção ao papel */
+.selo:active { transform: translate(-50%, -50%) scale(.96); transition-duration: var(--dur-fast); }
+.selo:focus-visible { outline: 2px solid var(--bronze-escuro); outline-offset: 8px; }
+.abrindo .selo {
+  transform: translate(-50%, -50%) scale(1.5) rotate(20deg); opacity: 0; pointer-events: none;
+  transition: transform .7s var(--mola), opacity .6s var(--ease-in);
+}
 
 /* =========================================================
    Brinde de espumante: as taças se tocam sobre o selo
@@ -191,9 +227,10 @@ img { display: block; max-width: 100%; }
   width: 30%; aspect-ratio: 60 / 200;
   transform-origin: 50% 100%;
   opacity: 0;
-  filter: drop-shadow(0 12px 16px rgba(122,90,65,.35)) drop-shadow(0 0 1px rgba(122,90,65,.5));
+  filter: drop-shadow(4px 12px 16px rgb(var(--sombra) / .35)) drop-shadow(0 0 1px rgb(var(--sombra) / .5));
 }
 .taca svg { width: 100%; height: 100%; overflow: visible; }
+.taca svg.espelhado { transform: scaleX(-1); }
 .taca-esq { left: -2.9%; }
 .taca-dir { right: -2.9%; }
 .brindando .taca-esq { animation: brindeEsq 1.9s cubic-bezier(.3, .7, .3, 1) forwards; }
@@ -224,6 +261,13 @@ img { display: block; max-width: 100%; }
   transform-box: fill-box; transform-origin: center;
   animation: bolha 1.5s linear infinite;
 }
+/* Cada bolha sobe num ritmo próprio */
+.bolhas circle:nth-child(2) { animation-delay: -.4s;  animation-duration: 1.2s; }
+.bolhas circle:nth-child(3) { animation-delay: -.9s;  animation-duration: 1.7s; }
+.bolhas circle:nth-child(4) { animation-delay: -1.1s; animation-duration: 1.3s; }
+.bolhas circle:nth-child(5) { animation-delay: -.2s;  animation-duration: 1.4s; }
+.bolhas circle:nth-child(6) { animation-delay: -.7s;  animation-duration: 1.8s; }
+.bolhas circle:nth-child(7) { animation-delay: -1.3s; animation-duration: 1.25s; }
 @keyframes bolha {
   0%   { opacity: 0; transform: translateY(0) scale(.6); }
   20%  { opacity: .9; }
@@ -237,20 +281,25 @@ img { display: block; max-width: 100%; }
   position: absolute; inset: 0; z-index: 2;
   container-type: inline-size;
   border-radius: 4px; overflow: hidden;
-  background: var(--papel) url("convite.webp?v=2026-11-09-8") center / cover;
-  box-shadow: 0 2px 6px rgba(122,90,65,.12);
+  background: var(--papel) url("convite.webp?v=2026-11-15-1") center / cover;
+  box-shadow: var(--elev-1);
   transform: translateY(0) scale(.94);
-  transition: transform 1.15s cubic-bezier(.5, 0, .2, 1), box-shadow 1s;
+  transition: transform 1.15s cubic-bezier(.5, 0, .2, 1);
 }
 .puxando .convite { transform: translateY(-104%) scale(.94); }
-.revelado .convite {
-  z-index: 6; transform: translateY(0) scale(1);
-  box-shadow: 0 50px 90px -40px rgba(100,70,45,.65), 0 12px 30px -12px rgba(100,70,45,.35);
-}
+.revelado .convite { z-index: 6; transform: translateY(0) scale(1); }
 .pronto .convite {
   transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  transition: transform .35s ease-out, box-shadow 1s;
+  transition: transform var(--dur-slow) var(--ease-out);
 }
+/* Sombra do convite revelado: fica numa camada própria, atrás dele, e só a opacidade anima */
+.cena::after {
+  content: ""; position: absolute; inset: 0; z-index: 0;
+  border-radius: 4px; pointer-events: none;
+  box-shadow: var(--elev-convite);
+  opacity: 0; transition: opacity 1s var(--ease-out);
+}
+.revelado .cena::after { opacity: 1; }
 /* Brilho que atravessa o convite uma vez, e reflexo que segue o mouse */
 .convite::before, .convite::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3; }
 .convite::before {
@@ -261,20 +310,27 @@ img { display: block; max-width: 100%; }
 @keyframes varrer { to { transform: translateX(120%); } }
 .convite::after {
   background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.3), transparent 42%);
-  opacity: 0; transition: opacity .4s;
+  opacity: 0; transition: opacity var(--dur-slow) var(--ease-out);
 }
-.pronto .convite:hover::after { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .pronto .convite:hover::after { opacity: 1; }
+}
 
 /* Textos sobre o convite, posicionados nos espaços livres da arte */
 .convite-conteudo { position: absolute; inset: 0; z-index: 4; }
-.texto { position: absolute; margin: 0; }
-.js .texto { opacity: 0; transform: translateY(14px); filter: blur(5px); transition: opacity 1.2s ease, transform 1.2s var(--mola), filter 1.2s; transition-delay: calc(var(--i) * .45s + .5s); }
-.js .pronto .texto { opacity: 1; transform: none; filter: none; }
 
 /* Textos do convite, como na versão final em PDF: todos centralizados */
 .surge { margin: 0; }
-.js .surge { opacity: 0; transform: translateY(12px); filter: blur(4px); transition: opacity 1.1s ease, transform 1.1s var(--mola), filter 1.1s; transition-delay: calc(var(--i) * .3s + .3s); }
-.js .pronto .surge { opacity: 1; transform: none; filter: none; }
+.js .surge { opacity: 0; transform: translateY(12px); transition: opacity 1.1s var(--ease-out), transform 1.1s var(--mola); transition-delay: calc(var(--i, 0) * .3s + .3s); }
+.js .pronto .surge { opacity: 1; transform: none; }
+/* Ordem de entrada dos textos */
+.t-nomes { --i: 0; }
+.t-convite { --i: 1; }
+.t-data { --i: 2; }
+.t-endereco { --i: 3; }
+.botao:nth-child(1) { --i: 4; }
+.botao:nth-child(2) { --i: 4.5; }
+.botao:nth-child(3) { --i: 5; }
 
 .t-nomes, .t-convite, .t-data, .t-endereco, .t-botoes {
   position: absolute; left: 0; right: 0;
@@ -318,24 +374,35 @@ img { display: block; max-width: 100%; }
   display: inline-flex; align-items: center; gap: .45em;
   text-decoration: underline dotted; text-decoration-thickness: 1px;
   text-underline-offset: .32em; text-decoration-color: color-mix(in srgb, currentColor 55%, transparent);
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
-  transition: color .3s, text-decoration-color .3s;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  transition: color var(--dur-base) var(--ease-out), text-decoration-color var(--dur-base) var(--ease-out);
+}
+/* Área de toque com pelo menos 44 px de altura, que inclui o ícone, sem mudar o layout */
+.t-acao::before {
+  content: ""; position: absolute;
+  left: -2.1em; right: -.6em; top: 50%;
+  height: max(44px, 100%); transform: translateY(-50%);
 }
 .t-acao-icone {
   flex: none; width: 1.15em; height: 1.15em;
   fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
-  transition: transform .4s var(--mola);
+  transition: transform var(--dur-base) var(--spring-snappy);
 }
 /* o ícone fica fora do bloco de texto, para o texto ficar exatamente no centro */
 .t-acao .t-acao-icone {
   position: absolute; right: 100%; top: 50%;
   margin-right: .5em; transform: translateY(-50%);
 }
-.t-acao:hover .t-acao-icone, .t-acao:focus-visible .t-acao-icone { transform: translateY(-62%) scale(1.12); }
-.t-acao:hover, .t-acao:focus-visible {
-  text-decoration-style: solid; text-decoration-color: currentColor; outline: none;
+@media (hover: hover) {
+  .t-acao:hover .t-acao-icone { transform: translateY(-62%) scale(1.12); }
+  .t-acao:hover { text-decoration-style: solid; text-decoration-color: currentColor; }
 }
-.t-acao:focus-visible { box-shadow: 0 0 0 .5cqw rgba(255,255,255,.8); border-radius: .3em; }
+.t-acao:focus-visible .t-acao-icone { transform: translateY(-62%) scale(1.12); }
+.t-acao:focus-visible {
+  text-decoration-style: solid; text-decoration-color: currentColor;
+  outline: 2px solid var(--cor-texto); outline-offset: 2px; border-radius: .3em;
+}
+.t-acao:active .t-acao-icone { transform: translateY(-50%) scale(.92); transition-duration: var(--dur-fast); }
 
 /* Ícones clicáveis, lado a lado, com legenda curta embaixo */
 .t-botoes {
@@ -343,18 +410,28 @@ img { display: block; max-width: 100%; }
   display: flex; justify-content: center; align-items: flex-start; gap: 3.5cqw;
 }
 .botao {
+  position: relative; touch-action: manipulation;
   display: flex; flex-direction: column; align-items: center; gap: 1.8cqw;
   width: 19cqw;
   color: var(--cor-texto); text-decoration: none;
   -webkit-tap-highlight-color: transparent;
 }
 .botao-icone {
-  position: relative; overflow: hidden; isolation: isolate;
+  position: relative; z-index: 1; overflow: hidden; isolation: isolate;
   display: grid; place-items: center;
   width: 12.5cqw; height: 12.5cqw; border-radius: 50%;
   background: var(--cor-botao); color: #fff;
-  box-shadow: 0 1.1cqw 2.4cqw -1.2cqw rgba(122,90,65,.7), inset 0 0 0 .5cqw rgba(255,255,255,.12);
-  transition: transform .35s var(--mola), background .3s, box-shadow .3s;
+  /* sombra de contato curta + realce no alto à esquerda, do lado da luz */
+  box-shadow: .3cqw 1.1cqw 2.4cqw -1.2cqw rgb(var(--sombra) / .7), inset 0 0 0 .5cqw rgba(255,255,255,.12), inset .35cqw .35cqw .5cqw rgba(255,255,255,.18);
+  transition: transform var(--dur-base) var(--spring-snappy), background-color var(--dur-base) var(--ease-out);
+}
+/* Sombra de elevação do botão: fica numa camada própria e só a opacidade anima */
+.botao::before {
+  content: ""; position: absolute; top: 0; left: 50%; z-index: 0;
+  width: 12.5cqw; height: 12.5cqw; margin-left: -6.25cqw; border-radius: 50%;
+  box-shadow: .6cqw 1.8cqw 3cqw -1.2cqw rgb(var(--sombra) / .8);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--spring-snappy);
 }
 .botao-icone svg {
   width: 52%; height: 52%;
@@ -377,15 +454,22 @@ img { display: block; max-width: 100%; }
   font-family: var(--sans); font-weight: 500;
   font-size: 7px; font-size: 2.05cqw; line-height: 1.45; letter-spacing: .14em; text-transform: uppercase;
   text-align: center; padding-left: .14em;
-  transition: color .3s;
+  transition: color var(--dur-base) var(--ease-out);
 }
-.botao:hover .botao-icone, .botao:focus-visible .botao-icone {
-  background: var(--cor-botao-escura); transform: translateY(-.6cqw) scale(1.04);
-  box-shadow: 0 1.8cqw 3cqw -1.2cqw rgba(122,90,65,.8), inset 0 0 0 .5cqw rgba(255,255,255,.12);
+@media (hover: hover) {
+  .botao:hover .botao-icone { background-color: var(--cor-botao-escura); transform: translateY(-.6cqw) scale(1.04); }
+  .botao:hover::before { opacity: 1; transform: translateY(-.6cqw) scale(1.04); }
+  .botao:hover .botao-legenda { color: var(--cor-botao-escura); }
 }
-.botao:hover .botao-legenda, .botao:focus-visible .botao-legenda { color: var(--cor-botao-escura); }
+.botao:focus-visible .botao-icone { background-color: var(--cor-botao-escura); transform: translateY(-.6cqw) scale(1.04); }
+.botao:focus-visible::before { opacity: 1; transform: translateY(-.6cqw) scale(1.04); }
+.botao:focus-visible .botao-legenda { color: var(--cor-botao-escura); }
+/* O contorno de foco fica no círculo, que é a parte visível do botão */
 .botao:focus-visible { outline: none; }
-.botao:focus-visible .botao-icone { box-shadow: 0 0 0 .5cqw #fff, 0 0 0 1cqw var(--cor-botao-escura); }
+.botao:focus-visible .botao-icone { outline: 2px solid var(--cor-botao-escura); outline-offset: 2px; }
+/* Ao tocar, o botão desce em direção ao papel e a sombra de elevação some */
+.botao:active .botao-icone { transform: translateY(.3cqw) scale(.95); transition-duration: var(--dur-fast); }
+.botao:active::before { opacity: 0; transform: none; transition-duration: var(--dur-fast); }
 
 /* =========================================================
    Sem JavaScript ou com pouco movimento: convite já aberto
@@ -399,6 +483,23 @@ html:not(.js) .convite { transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .luzes span, .dica, .botao-icone::after { animation: none !important; }
   .js .palco:not(.abrindo) .cena { animation: none; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Mais contraste, quando o sistema pede */
+@media (prefers-contrast: more) {
+  :root { --cor-nomes: #8C6B55; --cor-data: #7E5E48; --cor-botao: #8C6B55; --cor-botao-escura: #6B4F3C; }
+  .t-acao { text-decoration-style: solid; }
+}
+/* Cores forçadas (alto contraste do Windows) */
+@media (forced-colors: active) {
+  .botao-icone { border: 1px solid ButtonText; }
+  :focus-visible, .botao:focus-visible .botao-icone { outline: 2px solid Highlight; }
 }
 
 /* Telas baixas e largas (ex.: notebook): dá mais espaço ao convite */

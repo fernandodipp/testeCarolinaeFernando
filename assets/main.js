@@ -151,7 +151,9 @@
     } catch (e) { /* sem som */ }
   }
 
-  var TOQUE = 930;  // momento em que as taças se encontram (ms)
+  /* Com pouco movimento, a abertura acontece em etapas curtas, sem esperar animações que não serão vistas */
+  var ritmo = poucoMovimento ? .25 : 1;
+  var TOQUE = 930 * ritmo;  // momento em que as taças se encontram (ms)
   function abrir() {
     if (aberto) return;
     aberto = true;
@@ -167,18 +169,18 @@
     }, TOQUE);
 
     /* 2. O convite */
-    setTimeout(function () { palco.classList.add("puxando"); }, TOQUE + 1350);
+    setTimeout(function () { palco.classList.add("puxando"); }, TOQUE + 1350 * ritmo);
     setTimeout(function () {
       cena.style.animation = "none";
       palco.classList.add("revelado");
-    }, TOQUE + 2550);
+    }, TOQUE + 2550 * ritmo);
     setTimeout(function () {
       palco.classList.add("pronto");
       var c = centro(convite);
       estourar(c.x, c.y, 90, 1.6, c.w, c.h);
       var link = document.querySelector(".botao");
       if (link) link.focus({ preventScroll: true });
-    }, TOQUE + 3800);
+    }, TOQUE + 3800 * ritmo);
   }
 
   {
@@ -206,7 +208,7 @@
       "&dates=20270320T193000Z/20270321T023000Z" +
       "&location=" + encodeURIComponent(local + " - " + endereco) +
       "&details=" + encodeURIComponent("Cerimônia e festa. Confirme sua presença e veja a lista de presentes em https://www.carolinaefernando.com.br/");
-    linkAgenda.target = "_blank"; linkAgenda.rel = "noopener";
+    linkAgenda.target = "_blank"; linkAgenda.rel = "noopener noreferrer";
   }
 
   /* ---------- Inclinação 3D do convite com o mouse ---------- */
