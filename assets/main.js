@@ -151,35 +151,42 @@
     } catch (e) { /* sem som */ }
   }
 
-  var ritmo = 1;
-  var TOQUE = 930;  // momento em que as taças se encontram (ms)
+  var TOQUE = 930;    // momento em que as bordas das taças se tocam (ms)
+  var RACHA = 120;    // o selo racha logo depois do tilintar
+  /* Ponto de encontro das bordas: no centro da cena, a cerca de 13,8% da altura (ver .taca no CSS) */
+  function pontoDoBrinde() {
+    var r = cena.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height * .138 };
+  }
   function abrir() {
     if (aberto) return;
     aberto = true;
     tilintar(TOQUE / 1000);
 
-    /* 1. O brinde */
+    /* 1. O brinde: brilho e respingos saem das bordas que se tocam */
     palco.classList.add("brindando");
     setTimeout(function () {
-      var s = centro(selo);
-      estourar(s.x, s.y - s.h * .1, 46, 2.4);
-      respingar(s.x, s.y - s.h * .15, 34);
-      palco.classList.add("abrindo");
+      var b = pontoDoBrinde();
+      estourar(b.x, b.y, 40, 2.2);
+      respingar(b.x, b.y, 30);
     }, TOQUE);
 
-    /* 2. O convite */
-    setTimeout(function () { palco.classList.add("puxando"); }, TOQUE + 1350 * ritmo);
+    /* 2. O selo racha e a aba abre */
+    setTimeout(function () { palco.classList.add("abrindo"); }, TOQUE + RACHA);
+
+    /* 3. O convite sai do envelope e o envelope cai */
+    setTimeout(function () { palco.classList.add("puxando"); }, TOQUE + RACHA + 1450);
     setTimeout(function () {
       cena.style.animation = "none";
       palco.classList.add("revelado");
-    }, TOQUE + 2550 * ritmo);
+    }, TOQUE + RACHA + 2750);
     setTimeout(function () {
       palco.classList.add("pronto");
       var c = centro(convite);
       estourar(c.x, c.y, 90, 1.6, c.w, c.h);
       var link = document.querySelector(".botao");
       if (link) link.focus({ preventScroll: true });
-    }, TOQUE + 3800 * ritmo);
+    }, TOQUE + RACHA + 4000);
   }
 
   {

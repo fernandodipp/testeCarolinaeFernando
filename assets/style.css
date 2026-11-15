@@ -74,7 +74,7 @@ img { display: block; max-width: 100%; }
    ========================================================= */
 .fundo {
   position: fixed; inset: -12%;
-  background: url("convite.jpg?v=2026-11-15-3") center / cover;
+  background: url("convite.jpg?v=2026-11-15-4") center / cover;
   filter: blur(38px) saturate(1.15) brightness(.97);
   transform: scale(1.1);
 }
@@ -122,9 +122,11 @@ img { display: block; max-width: 100%; }
   position: relative;
   width: var(--cw); aspect-ratio: 941 / 1672;
   perspective: 1600px;
-  transform: scale(var(--s, .8));
+  transform: translateY(0) scale(var(--s, .8));
   transition: transform 1.3s var(--mola);
 }
+/* Enquanto o convite sai do envelope, a câmera recua para os dois caberem na tela */
+.puxando:not(.revelado) .cena { transform: translateY(28%) scale(.58); }
 .js .palco:not(.abrindo) .cena { animation: flutuar 5.5s ease-in-out infinite; }
 @keyframes flutuar {
   0%, 100% { transform: scale(var(--s, .8)) translateY(0) rotate(0); }
@@ -137,16 +139,17 @@ img { display: block; max-width: 100%; }
    ========================================================= */
 .env {
   position: absolute; inset: -2.5% -7%;
-  transition: transform 1.1s cubic-bezier(.55, 0, .3, 1), opacity .9s ease;
+  /* gravidade: começa devagar e acelera até sair da tela */
+  transition: transform .95s cubic-bezier(.5, 0, .9, .5);
 }
-.revelado .env { transform: translateY(85vh) rotate(5deg); opacity: 0; }
+.revelado .env { transform: translateY(120vh) rotate(4deg); }
 .revelado .selo { transform: translate(-50%, 85vh); opacity: 0; }
 
 /* Papel do envelope: textura do canto esquerdo do convite (abaixo das folhas), em ladrilho sem emendas e na mesma escala */
 .env-costas, .env-bolso, .env-aba {
   background-image:
     var(--tom),
-    url("papel-envelope.webp?v=2026-11-15-3");
+    url("papel-envelope.webp?v=2026-11-15-4");
   background-size: 100% 100%, calc(var(--cw) * .2125) calc(var(--cw) * .2125);
   background-position: 0 0, 0 0;
 }
@@ -180,19 +183,51 @@ img { display: block; max-width: 100%; }
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   border-radius: 6px 6px 0 0;
   transform-origin: 50% 0;
+  transform: translateY(0) rotate(0) rotateX(0deg);
   filter: drop-shadow(1px 1px 1px rgb(var(--sombra) / .28)) drop-shadow(2px 5px 7px rgb(var(--sombra) / .26));
-  transition: transform 1s cubic-bezier(.6, 0, .25, 1) .3s, z-index 0s .8s, filter 1s .3s, opacity .9s;
+  transition: z-index 0s .79s, filter 1s .3s;
+}
+/* Sombra própria da aba: escurece ao ficar de lado para a luz e clareia ao deitar */
+.env-aba::before {
+  content: ""; position: absolute; inset: 0; z-index: 1;
+  background: rgb(110 80 58); opacity: 0; pointer-events: none;
 }
 /* Verso da aba: o mesmo papel, levemente sombreado como o lado de dentro */
 .env-aba::after {
   content: ""; position: absolute; inset: 0;
   background:
     linear-gradient(180deg, rgba(150,108,80,.2), rgba(150,108,80,.06) 55%, rgba(255,246,236,.12)),
-    url("papel-envelope.webp?v=2026-11-15-3") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
-  opacity: 0; transition: opacity 0s .78s;
+    url("papel-envelope.webp?v=2026-11-15-4") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
+  opacity: 0; transition: opacity 0s .79s;
 }
 .abrindo .env-aba::after { opacity: 1; }
-.abrindo .env-aba { transform: rotateX(180deg); z-index: 0; filter: brightness(.97) drop-shadow(0 -2px 4px rgba(122,90,65,.2)); }
+.abrindo .env-aba {
+  transform: translateY(0) rotate(0) rotateX(180deg);
+  animation: abaAbrir 1.1s .3s both;
+  z-index: 0; filter: drop-shadow(0 -2px 4px rgb(var(--sombra) / .2));
+}
+.abrindo .env-aba::before { animation: abaSombra 1.1s .3s both; }
+.revelado .env-aba {
+  animation: none;
+  transform: translateY(120vh) rotate(4deg) rotateX(180deg);
+  transition: transform .95s cubic-bezier(.5, 0, .9, .5);
+}
+/* Erguida pela mão até a vertical (desacelera); depois cai pelo próprio peso (acelera) e quica de leve */
+@keyframes abaAbrir {
+  0%   { transform: translateY(0) rotate(0) rotateX(0deg);   animation-timing-function: cubic-bezier(.3, .5, .55, 1); }
+  45%  { transform: translateY(0) rotate(0) rotateX(90deg);  animation-timing-function: cubic-bezier(.5, 0, .9, .55); }
+  78%  { transform: translateY(0) rotate(0) rotateX(180deg); animation-timing-function: cubic-bezier(.2, .6, .4, 1); }
+  88%  { transform: translateY(0) rotate(0) rotateX(171deg); animation-timing-function: cubic-bezier(.5, 0, .7, 1); }
+  100% { transform: translateY(0) rotate(0) rotateX(180deg); }
+}
+@keyframes abaSombra {
+  0%   { opacity: 0; animation-timing-function: ease-in; }
+  45%  { opacity: .45; }
+  46%  { opacity: .4; animation-timing-function: ease-out; }
+  78%  { opacity: .04; }
+  88%  { opacity: .1; }
+  100% { opacity: 0; }
+}
 
 /* Selo de cera verde-oliva */
 .selo {
@@ -203,7 +238,7 @@ img { display: block; max-width: 100%; }
   border-radius: 50%;
   touch-action: manipulation;
   /* selo de cera em relevo: aro alto de cera empurrada e marca do carimbo rebaixada */
-  background: url("selo.webp?v=2026-11-15-3") center / contain no-repeat;
+  background: url("selo.webp?v=2026-11-15-4") center / contain no-repeat;
   filter: drop-shadow(3px 9px 10px rgba(40,46,34,.38)) drop-shadow(1px 2px 2px rgba(40,46,34,.35));
   transition: transform var(--dur-slow) var(--spring-soft), opacity .6s var(--ease-in);
 }
@@ -213,49 +248,114 @@ img { display: block; max-width: 100%; }
 /* Ao pressionar, a cera desce em direção ao papel */
 .selo:active { transform: translate(-50%, -50%) scale(.96); transition-duration: var(--dur-fast); }
 .selo:focus-visible { outline: 2px solid var(--bronze-escuro); outline-offset: 8px; }
-.abrindo .selo {
-  transform: translate(-50%, -50%) scale(1.5) rotate(20deg); opacity: 0; pointer-events: none;
-  transition: transform .7s var(--mola), opacity .6s var(--ease-in);
+/* Durante o brinde, o selo volta ao repouso, para a rachadura começar do lugar certo */
+.brindando .selo { transform: translate(-50%, -50%); pointer-events: none; }
+/* Na rachadura, o selo inteiro dá lugar às duas metades, no mesmo instante */
+.abrindo .selo { opacity: 0; transition: none; }
+
+/* Metades do selo. A sombra fica na camada de fora e o recorte na de dentro,
+   para a sombra acompanhar a borda da rachadura */
+.selo-meia {
+  position: absolute; left: 31.5%; top: 36.21%; z-index: 5;
+  width: 37%; aspect-ratio: 440 / 435;
+  filter: drop-shadow(3px 9px 10px rgba(40,46,34,.38)) drop-shadow(1px 2px 2px rgba(40,46,34,.35));
+  opacity: 0; pointer-events: none;
 }
+.selo-meia::before {
+  content: ""; position: absolute; inset: 0;
+  background: url("selo.webp?v=2026-11-15-4") center / contain no-repeat;
+}
+.selo-cima::before { clip-path: polygon(0 0, 100% 0, 100% 50%, 86% 54%, 72% 47%, 57% 55%, 43% 47%, 29% 54%, 15% 47%, 0 52%); }
+.selo-baixo::before { clip-path: polygon(0 52%, 15% 47%, 29% 54%, 43% 47%, 57% 55%, 72% 47%, 86% 54%, 100% 50%, 100% 100%, 0 100%); }
+.abrindo .selo-meia { opacity: 1; }
+/* A metade de cima está colada na aba: gira em torno da mesma dobra e some quando fica de costas */
+.selo-cima {
+  transform-origin: 50% -188%;
+  transform: translateY(0) rotate(0) rotateX(0deg);
+  backface-visibility: hidden;
+}
+.abrindo .selo-cima { animation: abaAbrir 1.1s .3s both; z-index: 0; transition: z-index 0s .79s; }
+/* A metade de baixo se solta, cede um pouco e cai girando, cada vez mais rápido */
+.abrindo .selo-baixo { z-index: 7; animation: seloCai 1.05s .04s both; }
+@keyframes seloCai {
+  0%   { transform: translate(0, 0) rotate(0); animation-timing-function: cubic-bezier(.2, .6, .4, 1); }
+  14%  { transform: translate(1.5%, 4%) rotate(5deg); animation-timing-function: cubic-bezier(.45, 0, .9, .45); }
+  100% { transform: translate(28%, 950%) rotate(58deg); }
+}
+.revelado .selo-meia { opacity: 0; }
 
 /* =========================================================
    Brinde de espumante: as taças se tocam sobre o selo
    ========================================================= */
 .brinde { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
 .taca {
-  position: absolute; bottom: 19%;
-  width: 30%; aspect-ratio: 60 / 200;
-  transform-origin: 50% 100%;
+  position: absolute; bottom: 40%;
+  width: 26%; aspect-ratio: 60 / 200;
+  /* gira pelo ponto em que a mão segura, no meio da haste */
+  transform-origin: 50% 70%;
   opacity: 0;
-  filter: drop-shadow(4px 12px 16px rgb(var(--sombra) / .35)) drop-shadow(0 0 1px rgb(var(--sombra) / .5));
+  /* a taça está no ar: sombra macia e afastada, mais um fio de contorno para o vidro aparecer no papel claro */
+  filter: drop-shadow(6px 16px 14px rgb(var(--sombra) / .22)) drop-shadow(0 0 .6px rgb(var(--sombra) / .45));
 }
 .taca svg { width: 100%; height: 100%; overflow: visible; }
 .taca svg.espelhado { transform: scaleX(-1); }
-.taca-esq { left: -2.9%; }
-.taca-dir { right: -2.9%; }
-.brindando .taca-esq { animation: brindeEsq 1.9s cubic-bezier(.3, .7, .3, 1) forwards; }
-.brindando .taca-dir { animation: brindeDir 1.9s cubic-bezier(.3, .7, .3, 1) forwards; }
-/* O toque acontece em 49% da animação (cerca de 0,93 s) */
+.taca-esq { left: 20.4%; }
+.taca-dir { right: 20.4%; }
+.brindando .taca-esq { animation: brindeEsq 2.2s both; }
+.brindando .taca-dir { animation: brindeDir 2.2s both; }
+.brindando .liquido { animation: espumante 2.2s both; }
+/* As taças chegam em arco, se tocam pela borda em 42% (cerca de 0,93 s), recuam com
+   um rebote amortecido que lembra a vibração do cristal, sobem no "saúde" e saem */
 @keyframes brindeEsq {
-  0%   { opacity: 0; transform: translate(-90%, 28%) rotate(-12deg); }
-  18%  { opacity: 1; }
-  42%  { transform: translate(-7%, 1%) rotate(15deg); }
-  49%  { transform: translate(1%, 0) rotate(18.5deg); }
-  56%  { transform: translate(-5%, 0) rotate(15.5deg); }
-  74%  { opacity: 1; transform: translate(-5%, -9%) rotate(13deg); }
-  100% { opacity: 0; transform: translate(-8%, -22%) rotate(9deg); }
+  0%    { opacity: 0; transform: translate(-260%, 22%) rotate(-8deg); animation-timing-function: cubic-bezier(.3, .1, .5, 1); }
+  12%   { opacity: 1; }
+  25%   { transform: translate(-95%, -7%) rotate(2deg);   animation-timing-function: cubic-bezier(.4, 0, .6, 1); }
+  38%   { transform: translate(-9%, 0) rotate(8.5deg);    animation-timing-function: cubic-bezier(.5, 0, 1, 1); }
+  42%   { transform: translate(0, 0) rotate(10deg);       animation-timing-function: cubic-bezier(0, 0, .4, 1); }
+  44%   { transform: translate(-4.5%, .4%) rotate(8.8deg); animation-timing-function: ease-in-out; }
+  46.5% { transform: translate(-1.5%, 0) rotate(9.6deg);  animation-timing-function: ease-in-out; }
+  49.5% { transform: translate(-4%, .2%) rotate(8.6deg);  animation-timing-function: ease-in-out; }
+  54%   { transform: translate(-2.8%, 0) rotate(9.1deg);  animation-timing-function: ease-in-out; }
+  60%   { transform: translate(-3.4%, 0) rotate(8.8deg);  animation-timing-function: cubic-bezier(.4, 0, .3, 1); }
+  72%   { transform: translate(-3.6%, -11%) rotate(8.2deg); animation-timing-function: ease-in-out; }
+  80%   { transform: translate(-4%, -12%) rotate(7.8deg); animation-timing-function: cubic-bezier(.55, 0, .8, .6); }
+  92%   { opacity: 1; }
+  100%  { opacity: 0; transform: translate(-240%, -2%) rotate(-5deg); }
 }
 @keyframes brindeDir {
-  0%   { opacity: 0; transform: translate(90%, 28%) rotate(12deg); }
-  18%  { opacity: 1; }
-  42%  { transform: translate(7%, 1%) rotate(-15deg); }
-  49%  { transform: translate(-1%, 0) rotate(-18.5deg); }
-  56%  { transform: translate(5%, 0) rotate(-15.5deg); }
-  74%  { opacity: 1; transform: translate(5%, -9%) rotate(-13deg); }
-  100% { opacity: 0; transform: translate(8%, -22%) rotate(-9deg); }
+  0%    { opacity: 0; transform: translate(260%, 22%) rotate(8deg); animation-timing-function: cubic-bezier(.3, .1, .5, 1); }
+  12%   { opacity: 1; }
+  25%   { transform: translate(95%, -7%) rotate(-2deg);   animation-timing-function: cubic-bezier(.4, 0, .6, 1); }
+  38%   { transform: translate(9%, 0) rotate(-8.5deg);    animation-timing-function: cubic-bezier(.5, 0, 1, 1); }
+  42%   { transform: translate(0, 0) rotate(-10deg);      animation-timing-function: cubic-bezier(0, 0, .4, 1); }
+  44%   { transform: translate(4.5%, .4%) rotate(-8.8deg); animation-timing-function: ease-in-out; }
+  46.5% { transform: translate(1.5%, 0) rotate(-9.6deg);  animation-timing-function: ease-in-out; }
+  49.5% { transform: translate(4%, .2%) rotate(-8.6deg);  animation-timing-function: ease-in-out; }
+  54%   { transform: translate(2.8%, 0) rotate(-9.1deg);  animation-timing-function: ease-in-out; }
+  60%   { transform: translate(3.4%, 0) rotate(-8.8deg);  animation-timing-function: cubic-bezier(.4, 0, .3, 1); }
+  72%   { transform: translate(3.6%, -11%) rotate(-8.2deg); animation-timing-function: ease-in-out; }
+  80%   { transform: translate(4%, -12%) rotate(-7.8deg); animation-timing-function: cubic-bezier(.55, 0, .8, .6); }
+  92%   { opacity: 1; }
+  100%  { opacity: 0; transform: translate(240%, -2%) rotate(5deg); }
 }
-/* O espumante fica na horizontal enquanto a taça inclina */
-.liquido { transform-box: view-box; transform-origin: 30px 34px; transform: rotate(-16deg); }
+/* Espumante: compensa a inclinação da taça (fica na horizontal) e, por inércia,
+   se atrasa na aceleração e avança no choque, acalmando em poucas oscilações.
+   Serve para as duas taças, porque a da direita é espelhada. */
+.liquido { transform-box: view-box; transform-origin: 30px 38px; transform: rotate(8deg); }
+@keyframes espumante {
+  0%    { transform: rotate(8deg);      animation-timing-function: cubic-bezier(.3, .1, .5, 1); }
+  25%   { transform: rotate(2deg);      animation-timing-function: cubic-bezier(.4, 0, .6, 1); }
+  38%   { transform: rotate(-6.5deg);   animation-timing-function: cubic-bezier(.5, 0, 1, 1); }
+  42%   { transform: rotate(-10deg);    animation-timing-function: cubic-bezier(0, 0, .4, 1); }
+  44%   { transform: rotate(-13.8deg);  animation-timing-function: ease-in-out; }
+  46.5% { transform: rotate(-16.6deg);  animation-timing-function: ease-in-out; }
+  49.5% { transform: rotate(-10.6deg);  animation-timing-function: ease-in-out; }
+  54%   { transform: rotate(-6.1deg);   animation-timing-function: ease-in-out; }
+  60%   { transform: rotate(-10deg);    animation-timing-function: cubic-bezier(.4, 0, .3, 1); }
+  72%   { transform: rotate(-7.7deg);   animation-timing-function: ease-in-out; }
+  80%   { transform: rotate(-7.8deg);   animation-timing-function: cubic-bezier(.55, 0, .8, .6); }
+  100%  { transform: rotate(2deg); }
+}
 .bolhas circle {
   fill: #fff; opacity: 0;
   transform-box: fill-box; transform-origin: center;
@@ -271,7 +371,7 @@ img { display: block; max-width: 100%; }
 @keyframes bolha {
   0%   { opacity: 0; transform: translateY(0) scale(.6); }
   20%  { opacity: .9; }
-  100% { opacity: 0; transform: translateY(-64px) scale(1.1); }
+  100% { opacity: 0; transform: translateY(-60px) scale(1.1); }
 }
 
 /* =========================================================
@@ -281,13 +381,28 @@ img { display: block; max-width: 100%; }
   position: absolute; inset: 0; z-index: 2;
   container-type: inline-size;
   border-radius: 4px; overflow: hidden;
-  background: var(--papel) url("convite.webp?v=2026-11-15-3") center / cover;
+  background: var(--papel) url("convite.webp?v=2026-11-15-4") center / cover;
   box-shadow: var(--elev-1);
-  transform: translateY(0) scale(.94);
-  transition: transform 1.15s cubic-bezier(.5, 0, .2, 1);
+  transform: translateY(0) rotate(0) scale(.94);
 }
-.puxando .convite { transform: translateY(-104%) scale(.94); }
-.revelado .convite { z-index: 6; transform: translateY(0) scale(1); }
+/* O papel prende no envelope, solta e sobe um pouco torto, como puxado por um canto */
+.puxando .convite {
+  transform: translateY(-104%) rotate(-.8deg) scale(.94);
+  animation: puxar 1.25s both;
+}
+@keyframes puxar {
+  0%   { transform: translateY(0) rotate(0) scale(.94);            animation-timing-function: cubic-bezier(.4, 0, .6, 1); }
+  10%  { transform: translateY(1.2%) rotate(.4deg) scale(.94);     animation-timing-function: cubic-bezier(.5, 0, .6, 1); }
+  40%  { transform: translateY(-30%) rotate(-1.6deg) scale(.94);   animation-timing-function: cubic-bezier(.3, 0, .7, 1); }
+  75%  { transform: translateY(-86%) rotate(-1.4deg) scale(.94);   animation-timing-function: cubic-bezier(.2, .6, .4, 1); }
+  100% { transform: translateY(-104%) rotate(-.8deg) scale(.94); }
+}
+/* Livre do envelope, o convite desce para o centro e assenta com um rebote leve */
+.revelado .convite {
+  z-index: 6; animation: none;
+  transform: translateY(0) rotate(0) scale(1);
+  transition: transform 1.2s cubic-bezier(.3, 1.12, .45, 1);
+}
 .pronto .convite {
   transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   transition: transform var(--dur-slow) var(--ease-out);
@@ -496,7 +611,7 @@ img { display: block; max-width: 100%; }
 /* =========================================================
    Sem JavaScript ou com pouco movimento: convite já aberto
    ========================================================= */
-html:not(.js) .env, html:not(.js) .selo, html:not(.js) .dica, html:not(.js) .chamada { display: none; }
+html:not(.js) .env, html:not(.js) .selo, html:not(.js) .selo-meia, html:not(.js) .dica, html:not(.js) .chamada { display: none; }
 html:not(.js) .cena { transform: none; }
 html:not(.js) .convite { transform: none; }
 
