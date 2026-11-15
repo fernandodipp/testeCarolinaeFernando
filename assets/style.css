@@ -2,7 +2,6 @@
    Fontes hospedadas no próprio site (sem pedidos ao Google)
    ========================================================= */
 @font-face { font-family: "Cinzel"; src: url("fontes/cinzel.woff2") format("woff2"); font-weight: 400 900; font-style: normal; font-display: swap; }
-@font-face { font-family: "Gilda Display"; src: url("fontes/gilda-display.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: "Montserrat"; src: url("fontes/montserrat.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
 @font-face { font-family: "Montserrat"; src: url("fontes/montserrat-italico.woff2") format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
 /* Fontes de reserva, usadas enquanto as do site carregam. As medidas imitam as fontes do site,
@@ -10,33 +9,37 @@
 @font-face { font-family: "Montserrat Reserva"; src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Arimo"); font-style: normal; size-adjust: 110.56%; ascent-override: 87.56%; descent-override: 22.7%; line-gap-override: 0%; }
 @font-face { font-family: "Montserrat Reserva"; src: local("Arial Italic"), local("Arial-ItalicMT"), local("Liberation Sans Italic"), local("Arimo Italic"); font-style: italic; size-adjust: 110.56%; ascent-override: 87.56%; descent-override: 22.7%; line-gap-override: 0%; }
 @font-face { font-family: "Cinzel Reserva"; src: local("Times New Roman"), local("TimesNewRomanPSMT"), local("Liberation Serif"), local("Tinos"); size-adjust: 124.68%; ascent-override: 78.28%; descent-override: 29.84%; line-gap-override: 0%; }
-@font-face { font-family: "Gilda Reserva"; src: local("Times New Roman"), local("TimesNewRomanPSMT"), local("Liberation Serif"), local("Tinos"); size-adjust: 109.43%; ascent-override: 81.51%; descent-override: 26.04%; line-gap-override: 0%; }
 
 /* =========================================================
    Identidade visual
    ========================================================= */
 :root {
   color-scheme: light;
-  --oliva: #4E5A46;
-  --salvia: #A9B5A0;
-  --blush: #F2D7B8;
-  --terracota: #C9735A;
-  --bronze: #9A7556;
-  --bronze-escuro: #7A5A41;
-  --ouro: #D6AF6E;
-  --papel: #FBECE0;
-  --pessego: #F3D9C5;
 
-  /* Mesmas famílias do site no iCasei: Trajan Pro, Wondershine e Montserrat.
-     Trajan Pro e Wondershine são pagas; usamos as equivalentes gratuitas mais próximas. */
-  --titulo: "Cinzel", "Cinzel Reserva", "Trajan Pro", Georgia, serif;              /* no lugar da Trajan Pro */
-  --serifa: "Gilda Display", "Gilda Reserva", "Wondershine", Georgia, serif;      /* no lugar da Wondershine */
+  /* Paleta: tons de bronze sobre papel. Em hexadecimal aqui; em OKLCH logo abaixo, quando há suporte.
+     Na escala de bronze, só a luminosidade muda; o matiz fica perto de 57°. */
+  --papel: #FBECE0;
+  --bronze-claro: #B8977F;
+  --bronze: #9A7556;
+  --nogueira: #87644C;        /* tom dos nomes do PDF (#C8AD9A), escurecido até 4,5:1 sobre o papel */
+  --bronze-escuro: #7A5A41;
+  --nogueira-forte: #6B4F3C;
+  --tinta: #3A3532;           /* cinza-escuro do PDF (#333333) */
+  --ouro: #D6AF6E;
+
+  /* Cores por papel: os componentes usam só estas */
+  --superficie: var(--papel);
+  --texto: var(--tinta);                    /* 10,3:1 sobre o papel */
+  --texto-destaque: var(--nogueira);        /* nomes e data: 4,5:1 */
+  --texto-suave: var(--bronze-escuro);      /* chamada, dica, ícones e envelope: 4,9:1 */
+  --acento: var(--ouro);                    /* só decoração, nunca texto */
+  --foco: var(--bronze-escuro);             /* contorno de foco: 5,3:1 */
+  --botao-solido: var(--bronze-claro);      /* botão sem vidro, com mais contraste */
+  --botao-solido-escuro: var(--bronze);
+
+  /* Duas famílias: Cinzel (no lugar da Trajan Pro, paga) e Montserrat */
+  --titulo: "Cinzel", "Cinzel Reserva", "Trajan Pro", Georgia, serif;
   --sans: "Montserrat", "Montserrat Reserva", system-ui, sans-serif;
-  --cor-nomes: #BB9C86;        /* nomes: tom do PDF (#C8AD9A), um pouco mais firme */
-  --cor-data: #B8927A;         /* data: tom do PDF (#C39D82) */
-  --cor-texto: #3A3532;        /* convite e endereço: cinza-escuro do PDF (#333333) */
-  --cor-botao: #B8977F;
-  --cor-botao-escura: #9E7D66;
   --mola: cubic-bezier(.2, .8, .2, 1);   /* sequência de abertura do envelope */
 
   /* Movimento das interações: duração e curva de acordo com a massa do objeto */
@@ -58,6 +61,19 @@
   --cw: min(calc((100vw - 40px) / 1.14), calc(84vh * .5628));
   --cw: min(calc((100vw - 40px) / 1.14), calc(84svh * .5628), 520px);
 }
+/* Mesmas cores em OKLCH (luminosidade, croma e matiz): mais precisas e base para misturas uniformes */
+@supports (color: oklch(0 0 0)) {
+  :root {
+    --papel: oklch(.952 .023 61.2);
+    --bronze-claro: oklch(.700 .052 57.8);
+    --bronze: oklch(.591 .064 61.1);
+    --nogueira: oklch(.533 .058 55.6);
+    --bronze-escuro: oklch(.495 .056 59);
+    --nogueira-forte: oklch(.452 .048 55.3);
+    --tinta: oklch(.333 .009 53.2);
+    --ouro: oklch(.775 .095 79.4);
+  }
+}
 /* Sem suporte a linear(): a mola vira uma curva suave, com a mesma duração */
 @supports not (transition-timing-function: linear(0, 1)) {
   :root { --spring-soft: var(--ease-out); --spring-snappy: var(--ease-out); }
@@ -67,9 +83,11 @@
 html, body { height: 100%; }
 body {
   margin: 0; overflow: hidden;
-  background: var(--papel);
-  color: var(--bronze);
-  font-family: var(--serifa);
+  background: var(--superficie);
+  color: var(--texto);
+  font-family: var(--sans);
+  font-kerning: normal;
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
 }
@@ -89,7 +107,7 @@ img { display: block; max-width: 100%; }
 .palco { --prof: 16; }
 .fundo {
   position: fixed; inset: -12%;
-  background: url("convite.jpg?v=2026-11-15-5") center / cover;
+  background: url("convite.jpg?v=2026-11-15-6") center / cover;
   filter: blur(38px) saturate(1.15) brightness(.97);
   transform: scale(1.1);
 }
@@ -122,12 +140,12 @@ img { display: block; max-width: 100%; }
 }
 .chamada, .dica {
   position: absolute; left: 0; right: 0; margin: 0; text-align: center;
-  font-family: var(--sans); font-size: .68rem; letter-spacing: .32em; text-transform: uppercase;
-  color: var(--bronze-escuro);
+  font-family: var(--sans); font-size: .75rem; line-height: 1.4; letter-spacing: .24em; text-transform: uppercase;
+  color: var(--texto-suave);
   transition: opacity var(--dur-slow) var(--ease-in), transform var(--dur-slow) var(--ease-in);
 }
 .chamada { top: max(4vh, 18px); }
-.chamada::before, .chamada::after { content: "✦"; margin: 0 .8em; color: var(--ouro); font-size: .8em; }
+.chamada::before, .chamada::after { content: "✦"; margin: 0 .8em; color: var(--acento); font-size: .8em; }
 .dica { bottom: max(4.5vh, 22px); animation: piscar 2.6s ease-in-out infinite; }
 @keyframes piscar { 50% { opacity: .35; } }
 .brindando .chamada, .brindando .dica { animation: none; opacity: 0; transform: translateY(8px); pointer-events: none; }
@@ -196,7 +214,7 @@ img { display: block; max-width: 100%; }
 .env-costas, .env-bolso, .env-aba {
   background-image:
     var(--tom),
-    url("papel-envelope.webp?v=2026-11-15-5");
+    url("papel-envelope.webp?v=2026-11-15-6");
   background-size: 100% 100%, calc(var(--cw) * .2125) calc(var(--cw) * .2125);
   background-position: 0 0, 0 0;
 }
@@ -228,7 +246,7 @@ img { display: block; max-width: 100%; }
 }
 .env-para {
   position: absolute; left: 0; right: 0; bottom: 13%; z-index: 1; margin: 0; text-align: center;
-  font-family: var(--serifa); font-size: calc(var(--cw) * .062); color: var(--bronze);
+  font-family: var(--titulo); font-size: calc(var(--cw) * .05); letter-spacing: .03em; color: var(--texto-suave);
   text-shadow: 0 1px 0 rgba(255,255,255,.6);
 }
 .env-aba {
@@ -251,7 +269,7 @@ img { display: block; max-width: 100%; }
   content: ""; position: absolute; inset: 0;
   background:
     linear-gradient(180deg, rgba(150,108,80,.2), rgba(150,108,80,.06) 55%, rgba(255,246,236,.12)),
-    url("papel-envelope.webp?v=2026-11-15-5") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
+    url("papel-envelope.webp?v=2026-11-15-6") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
   opacity: 0; transition: opacity 0s .79s;
 }
 .abrindo .env-aba::after { opacity: 1; }
@@ -292,7 +310,7 @@ img { display: block; max-width: 100%; }
   border-radius: 50%;
   touch-action: manipulation;
   /* selo de cera em relevo: aro alto de cera empurrada e marca do carimbo rebaixada */
-  background: url("selo.webp?v=2026-11-15-5") center / contain no-repeat;
+  background: url("selo.webp?v=2026-11-15-6") center / contain no-repeat;
   filter: drop-shadow(3px 9px 10px rgba(40,46,34,.38)) drop-shadow(1px 2px 2px rgba(40,46,34,.35));
   transition: transform var(--dur-slow) var(--spring-soft), opacity .6s var(--ease-in);
 }
@@ -301,7 +319,7 @@ img { display: block; max-width: 100%; }
 }
 /* Ao pressionar, a cera desce em direção ao papel */
 .selo:active { transform: translate(-50%, -50%) scale(.96); transition-duration: var(--dur-fast); }
-.selo:focus-visible { outline: 2px solid var(--bronze-escuro); outline-offset: 8px; }
+.selo:focus-visible { outline: 2px solid var(--foco); outline-offset: 8px; }
 /* Durante o brinde, o selo volta ao repouso, para a rachadura começar do lugar certo */
 .brindando .selo { transform: translate(-50%, -50%); pointer-events: none; }
 /* Na rachadura, o selo inteiro dá lugar às duas metades, no mesmo instante */
@@ -317,7 +335,7 @@ img { display: block; max-width: 100%; }
 }
 .selo-meia::before {
   content: ""; position: absolute; inset: 0;
-  background: url("selo.webp?v=2026-11-15-5") center / contain no-repeat;
+  background: url("selo.webp?v=2026-11-15-6") center / contain no-repeat;
 }
 .selo-cima::before { clip-path: polygon(0 0, 100% 0, 100% 50%, 86% 54%, 72% 47%, 57% 55%, 43% 47%, 29% 54%, 15% 47%, 0 52%); }
 .selo-baixo::before { clip-path: polygon(0 52%, 15% 47%, 29% 54%, 43% 47%, 57% 55%, 72% 47%, 86% 54%, 100% 50%, 100% 100%, 0 100%); }
@@ -437,7 +455,7 @@ img { display: block; max-width: 100%; }
   position: absolute; inset: 0; z-index: 2;
   container-type: inline-size;
   border-radius: 4px; overflow: hidden;
-  background: var(--papel) url("convite.webp?v=2026-11-15-5") center / cover;
+  background: var(--superficie) url("convite.webp?v=2026-11-15-6") center / cover;
   box-shadow: var(--elev-1);
   transform: translateY(0) rotate(0) scale(.94);
 }
@@ -513,27 +531,27 @@ img { display: block; max-width: 100%; }
   top: 22.8%;
   font-family: var(--titulo); font-weight: 400;
   font-size: 19px; font-size: 5.95cqw; line-height: 1.2; letter-spacing: 0;
-  color: var(--cor-nomes);
+  color: var(--texto-destaque);
 }
 .t-convite {
-  top: 32.8%; padding-left: .09em;
+  top: 32.8%; padding-left: .04em;
   font-family: var(--sans); font-style: italic; font-weight: 400;
-  font-size: 9px; font-size: 2.8cqw; line-height: 1.75; letter-spacing: .09em;
-  color: var(--cor-texto);
+  font-size: 10px; font-size: 3.3cqw; line-height: 1.6; letter-spacing: .04em;
+  color: var(--texto);
 }
 .t-data {
   top: 43.7%; width: max-content; left: 50%; right: auto; transform: translateX(-50%);
   font-family: var(--sans); font-style: italic; font-weight: 600;
-  font-size: 12px; font-size: 3.72cqw; line-height: 1.3; letter-spacing: 0;
-  color: var(--cor-data);
+  font-size: 13px; font-size: 4.1cqw; line-height: 1.3; letter-spacing: 0;
+  color: var(--texto-destaque);
 }
 .js .t-data.surge { transform: translate(-50%, 12px); }
 .js .pronto .t-data.surge { transform: translateX(-50%); }
 .t-endereco {
-  top: 52.4%; width: max-content; left: 50%; right: auto; transform: translateX(-50%); padding-left: .09em;
+  top: 52.4%; width: max-content; left: 50%; right: auto; transform: translateX(-50%); padding-left: .04em;
   font-family: var(--sans); font-style: italic; font-weight: 400;
-  font-size: 9px; font-size: 2.62cqw; line-height: 1.4; letter-spacing: .09em;
-  color: var(--cor-texto);
+  font-size: 10px; font-size: 3.2cqw; line-height: 1.4; letter-spacing: .04em;
+  color: var(--texto);
 }
 .js .t-endereco.surge { transform: translate(-50%, 12px); }
 .js .pronto .t-endereco.surge { transform: translateX(-50%); }
@@ -546,7 +564,7 @@ img { display: block; max-width: 100%; }
 .t-acao {
   display: inline-flex; align-items: center; gap: .45em;
   text-decoration: underline dotted; text-decoration-thickness: 1px;
-  text-underline-offset: .32em; text-decoration-color: color-mix(in srgb, currentColor 55%, transparent);
+  text-underline-offset: .32em; text-decoration-color: color-mix(in oklch, currentColor 55%, transparent);
   cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
   transition: color var(--dur-base) var(--ease-out), text-decoration-color var(--dur-base) var(--ease-out);
 }
@@ -573,20 +591,20 @@ img { display: block; max-width: 100%; }
 .t-acao:focus-visible .t-acao-icone { transform: translateY(-62%) scale(1.12); }
 .t-acao:focus-visible {
   text-decoration-style: solid; text-decoration-color: currentColor;
-  outline: 2px solid var(--cor-texto); outline-offset: 2px; border-radius: .3em;
+  outline: 2px solid var(--texto); outline-offset: 2px; border-radius: .3em;
 }
 .t-acao:active .t-acao-icone { transform: translateY(-50%) scale(.92); transition-duration: var(--dur-fast); }
 
 /* Ícones clicáveis, lado a lado, com legenda curta embaixo */
 .t-botoes {
   top: 63.4%;
-  display: flex; justify-content: center; align-items: flex-start; gap: 3.5cqw;
+  display: flex; justify-content: center; align-items: flex-start; gap: 2.5cqw;
 }
 .botao {
   position: relative; touch-action: manipulation;
   display: flex; flex-direction: column; align-items: center; gap: 1.8cqw;
-  width: 19cqw;
-  color: var(--cor-texto); text-decoration: none;
+  width: 24cqw;
+  color: var(--texto); text-decoration: none;
   -webkit-tap-highlight-color: transparent;
 }
 .botao-icone {
@@ -604,7 +622,7 @@ img { display: block; max-width: 100%; }
     linear-gradient(140deg, rgb(255 255 255 / .55) 0%, rgb(255 255 255 / .12) 42%, transparent 60%, rgb(var(--sombra) / .10) 100%);
   background-size: 48px 48px, 100% 100%;
   border: 1px solid rgb(255 255 255 / .7);
-  color: var(--bronze-escuro);
+  color: var(--texto-suave);
   /* vidro: sombra leve e curta; borda clara por dentro, do lado da luz */
   box-shadow:
     .3cqw .9cqw 1.8cqw -.8cqw rgb(var(--sombra) / .45),
@@ -651,21 +669,21 @@ img { display: block; max-width: 100%; }
 }
 .botao-legenda {
   font-family: var(--sans); font-weight: 500;
-  font-size: 7px; font-size: 2.05cqw; line-height: 1.45; letter-spacing: .14em; text-transform: uppercase;
-  text-align: center; padding-left: .14em;
+  font-size: 9px; font-size: 3cqw; line-height: 1.4; letter-spacing: .08em; text-transform: uppercase;
+  text-align: center; padding-left: .08em;
   transition: color var(--dur-base) var(--ease-out);
 }
 @media (hover: hover) {
   .botao:hover .botao-icone { background-color: var(--vidro-hover); transform: translateY(-.6cqw) scale(1.04); }
   .botao:hover::before { opacity: 1; transform: translateY(-.6cqw) scale(1.04); }
-  .botao:hover .botao-legenda { color: var(--cor-botao-escura); }
+  .botao:hover .botao-legenda { color: var(--texto-suave); }
 }
 .botao:focus-visible .botao-icone { background-color: var(--vidro-hover); transform: translateY(-.6cqw) scale(1.04); }
 .botao:focus-visible::before { opacity: 1; transform: translateY(-.6cqw) scale(1.04); }
-.botao:focus-visible .botao-legenda { color: var(--cor-botao-escura); }
+.botao:focus-visible .botao-legenda { color: var(--texto-suave); }
 /* O contorno de foco fica no círculo, que é a parte visível do botão */
 .botao:focus-visible { outline: none; }
-.botao:focus-visible .botao-icone { outline: 2px solid var(--cor-botao-escura); outline-offset: 2px; }
+.botao:focus-visible .botao-icone { outline: 2px solid var(--foco); outline-offset: 2px; }
 /* Ao tocar, o botão desce em direção ao papel e a sombra de elevação some */
 .botao:active .botao-icone { transform: translateY(.3cqw) scale(.95); transition-duration: var(--dur-fast); }
 .botao:active::before { opacity: 0; transform: none; transition-duration: var(--dur-fast); }
@@ -687,9 +705,9 @@ html:not(.js) .convite { transform: none; }
 
 /* Mais contraste, quando o sistema pede */
 @media (prefers-contrast: more) {
-  :root { --cor-nomes: #8C6B55; --cor-data: #7E5E48; --cor-botao: #8C6B55; --cor-botao-escura: #6B4F3C; }
+  :root { --texto-destaque: var(--nogueira-forte); --texto-suave: var(--nogueira-forte); }
   /* Com mais contraste, o vidro vira um botão sólido */
-  .botao-icone { --vidro: var(--cor-botao); --vidro-hover: var(--cor-botao-escura); color: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .botao-icone { --vidro: var(--botao-solido); --vidro-hover: var(--botao-solido-escuro); color: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .t-acao { text-decoration-style: solid; }
 }
 /* Cores forçadas (alto contraste do Windows) */

@@ -11,7 +11,7 @@ Os links levam ao site principal em [carolinaefernando.com.br](https://www.carol
 | `assets/style.css` | Envelope, convite, cores e animações |
 | `assets/main.js` | Abertura do envelope, brilhos, som do brinde e links de agenda |
 | `assets/js-ativo.js` | Marca que o JavaScript está ativo (evita mostrar o convite antes do envelope) |
-| `assets/fontes/` | Fontes Cinzel, Gilda Display e Montserrat, hospedadas no próprio site |
+| `assets/fontes/` | Fontes Cinzel e Montserrat, hospedadas no próprio site |
 | `assets/convite.webp` | Arte do convite (também em `convite.jpg`) |
 | `assets/papel-envelope.webp` | Textura do envelope, tirada do canto esquerdo do convite, abaixo das folhas (repete sem emendas) |
 | `assets/selo.webp` | Selo de cera em relevo |
