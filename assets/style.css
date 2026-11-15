@@ -5,6 +5,12 @@
 @font-face { font-family: "Gilda Display"; src: url("fontes/gilda-display.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: "Montserrat"; src: url("fontes/montserrat.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
 @font-face { font-family: "Montserrat"; src: url("fontes/montserrat-italico.woff2") format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
+/* Fontes de reserva, usadas enquanto as do site carregam. As medidas imitam as fontes do site,
+   para o texto não pular na troca. Valores medidos no navegador com o próprio texto do convite. */
+@font-face { font-family: "Montserrat Reserva"; src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Arimo"); font-style: normal; size-adjust: 110.56%; ascent-override: 87.56%; descent-override: 22.7%; line-gap-override: 0%; }
+@font-face { font-family: "Montserrat Reserva"; src: local("Arial Italic"), local("Arial-ItalicMT"), local("Liberation Sans Italic"), local("Arimo Italic"); font-style: italic; size-adjust: 110.56%; ascent-override: 87.56%; descent-override: 22.7%; line-gap-override: 0%; }
+@font-face { font-family: "Cinzel Reserva"; src: local("Times New Roman"), local("TimesNewRomanPSMT"), local("Liberation Serif"), local("Tinos"); size-adjust: 124.68%; ascent-override: 78.28%; descent-override: 29.84%; line-gap-override: 0%; }
+@font-face { font-family: "Gilda Reserva"; src: local("Times New Roman"), local("TimesNewRomanPSMT"), local("Liberation Serif"), local("Tinos"); size-adjust: 109.43%; ascent-override: 81.51%; descent-override: 26.04%; line-gap-override: 0%; }
 
 /* =========================================================
    Identidade visual
@@ -23,9 +29,9 @@
 
   /* Mesmas famílias do site no iCasei: Trajan Pro, Wondershine e Montserrat.
      Trajan Pro e Wondershine são pagas; usamos as equivalentes gratuitas mais próximas. */
-  --titulo: "Cinzel", "Trajan Pro", Georgia, serif;              /* no lugar da Trajan Pro */
-  --serifa: "Gilda Display", "Wondershine", Georgia, serif;      /* no lugar da Wondershine */
-  --sans: "Montserrat", system-ui, sans-serif;
+  --titulo: "Cinzel", "Cinzel Reserva", "Trajan Pro", Georgia, serif;              /* no lugar da Trajan Pro */
+  --serifa: "Gilda Display", "Gilda Reserva", "Wondershine", Georgia, serif;      /* no lugar da Wondershine */
+  --sans: "Montserrat", "Montserrat Reserva", system-ui, sans-serif;
   --cor-nomes: #BB9C86;        /* nomes: tom do PDF (#C8AD9A), um pouco mais firme */
   --cor-data: #B8927A;         /* data: tom do PDF (#C39D82) */
   --cor-texto: #3A3532;        /* convite e endereço: cinza-escuro do PDF (#333333) */
@@ -72,9 +78,18 @@ img { display: block; max-width: 100%; }
 /* =========================================================
    Fundo: o próprio convite desfocado + luzes suaves
    ========================================================= */
+/* Profundidade: com o mouse, a camada mais distante se move menos e a mais próxima, mais.
+   --px e --py vão de -1 a 1 e são definidos pelo JavaScript. */
+.fundo, .luzes, .palco {
+  translate: calc(var(--px, 0) * var(--prof) * -1px) calc(var(--py, 0) * var(--prof) * -1px);
+  transition: translate 700ms var(--ease-out);
+}
+.fundo { --prof: 4; }
+.luzes { --prof: 9; }
+.palco { --prof: 16; }
 .fundo {
   position: fixed; inset: -12%;
-  background: url("convite.jpg?v=2026-11-15-4") center / cover;
+  background: url("convite.jpg?v=2026-11-15-5") center / cover;
   filter: blur(38px) saturate(1.15) brightness(.97);
   transform: scale(1.1);
 }
@@ -117,8 +132,32 @@ img { display: block; max-width: 100%; }
 @keyframes piscar { 50% { opacity: .35; } }
 .brindando .chamada, .brindando .dica { animation: none; opacity: 0; transform: translateY(8px); pointer-events: none; }
 
+/* Sombra do envelope na mesa. Fica fora da cena para não flutuar junto:
+   quando o envelope sobe, ela cresce, se afasta e fica mais fraca */
+.sombra-env {
+  grid-area: 1 / 1; pointer-events: none;
+  width: calc(var(--cw) * 1.14); aspect-ratio: 1072.74 / 1755.6;
+  border-radius: 6px;
+  box-shadow: 6px 40px 70px -30px rgb(var(--sombra) / .6);
+  transform: scale(var(--s, .8)) translate(0, 0);
+}
+.js .palco:not(.abrindo) .sombra-env { animation: pousarSombra .95s both, sombraFlutuar 5.5s ease-in-out .95s infinite; }
+/* Na abertura, a sombra passa para o próprio envelope, que deixa de flutuar */
+.abrindo .sombra-env { opacity: 0; transition: opacity .4s var(--ease-out); }
+@keyframes sombraFlutuar {
+  0%, 100% { transform: scale(var(--s, .8)) translate(0, 0); opacity: 1; }
+  50% { transform: scale(calc(var(--s, .8) * 1.025)) translate(4px, 7px); opacity: .72; }
+}
+@keyframes pousarSombra {
+  0%   { transform: scale(calc(var(--s, .8) * 1.25)) translate(14px, 22px); opacity: 0; animation-timing-function: cubic-bezier(.5, 0, .9, .5); }
+  72%  { transform: scale(var(--s, .8)) translate(0, 0); opacity: 1; animation-timing-function: cubic-bezier(.2, .6, .4, 1); }
+  86%  { transform: scale(calc(var(--s, .8) * 1.01)) translate(1px, 1px); opacity: .92; animation-timing-function: cubic-bezier(.5, 0, .7, 1); }
+  100% { transform: scale(var(--s, .8)) translate(0, 0); opacity: 1; }
+}
+
 /* A cena tem o tamanho exato do convite */
 .cena {
+  grid-area: 1 / 1;
   position: relative;
   width: var(--cw); aspect-ratio: 941 / 1672;
   perspective: 1600px;
@@ -127,7 +166,15 @@ img { display: block; max-width: 100%; }
 }
 /* Enquanto o convite sai do envelope, a câmera recua para os dois caberem na tela */
 .puxando:not(.revelado) .cena { transform: translateY(28%) scale(.58); }
-.js .palco:not(.abrindo) .cena { animation: flutuar 5.5s ease-in-out infinite; }
+/* Ao carregar, o envelope cai na mesa (fica menor ao se afastar de quem olha), quica de leve e depois flutua */
+.js .palco:not(.abrindo) .cena { animation: pousar .95s both, flutuar 5.5s ease-in-out .95s infinite; }
+@keyframes pousar {
+  0%   { transform: scale(calc(var(--s, .8) * 1.14)) translateY(-18px) rotate(-2.5deg); opacity: 0; animation-timing-function: cubic-bezier(.5, 0, .9, .5); }
+  15%  { opacity: 1; }
+  72%  { transform: scale(var(--s, .8)) translateY(0) rotate(.3deg); animation-timing-function: cubic-bezier(.2, .6, .4, 1); }
+  86%  { transform: scale(calc(var(--s, .8) * 1.012)) translateY(-2px) rotate(0deg); animation-timing-function: cubic-bezier(.5, 0, .7, 1); }
+  100% { transform: scale(var(--s, .8)) translateY(0) rotate(0deg); }
+}
 @keyframes flutuar {
   0%, 100% { transform: scale(var(--s, .8)) translateY(0) rotate(0); }
   50% { transform: scale(var(--s, .8)) translateY(-10px) rotate(-.5deg); }
@@ -149,18 +196,25 @@ img { display: block; max-width: 100%; }
 .env-costas, .env-bolso, .env-aba {
   background-image:
     var(--tom),
-    url("papel-envelope.webp?v=2026-11-15-4");
+    url("papel-envelope.webp?v=2026-11-15-5");
   background-size: 100% 100%, calc(var(--cw) * .2125) calc(var(--cw) * .2125);
   background-position: 0 0, 0 0;
 }
 .env-costas {
   z-index: 1; border-radius: 6px;
   --tom: linear-gradient(rgba(190,148,118,.22), rgba(190,148,118,.22));
+  /* sombra de contato, curta; a sombra longa fica na mesa (.sombra-env) */
   box-shadow:
-    6px 40px 70px -30px rgb(var(--sombra) / .6),
     2px 8px 18px -8px rgb(var(--sombra) / .35),
     inset 0 0 40px rgba(154,117,86,.25);
 }
+/* Sombra longa do envelope depois que ele para de flutuar: só a opacidade anima */
+.env-costas::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: 6px 40px 70px -30px rgb(var(--sombra) / .6);
+  opacity: 0; transition: opacity .4s var(--ease-out);
+}
+.abrindo .env-costas::after { opacity: 1; }
 .env-bolso {
   z-index: 3; border-radius: 6px;
   --tom: linear-gradient(100deg, rgba(205,165,135,.2), rgba(255,248,240,.08) 50%, rgba(205,165,135,.2));
@@ -197,7 +251,7 @@ img { display: block; max-width: 100%; }
   content: ""; position: absolute; inset: 0;
   background:
     linear-gradient(180deg, rgba(150,108,80,.2), rgba(150,108,80,.06) 55%, rgba(255,246,236,.12)),
-    url("papel-envelope.webp?v=2026-11-15-4") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
+    url("papel-envelope.webp?v=2026-11-15-5") 0 0 / calc(var(--cw) * .2125) calc(var(--cw) * .2125);
   opacity: 0; transition: opacity 0s .79s;
 }
 .abrindo .env-aba::after { opacity: 1; }
@@ -238,7 +292,7 @@ img { display: block; max-width: 100%; }
   border-radius: 50%;
   touch-action: manipulation;
   /* selo de cera em relevo: aro alto de cera empurrada e marca do carimbo rebaixada */
-  background: url("selo.webp?v=2026-11-15-4") center / contain no-repeat;
+  background: url("selo.webp?v=2026-11-15-5") center / contain no-repeat;
   filter: drop-shadow(3px 9px 10px rgba(40,46,34,.38)) drop-shadow(1px 2px 2px rgba(40,46,34,.35));
   transition: transform var(--dur-slow) var(--spring-soft), opacity .6s var(--ease-in);
 }
@@ -263,7 +317,7 @@ img { display: block; max-width: 100%; }
 }
 .selo-meia::before {
   content: ""; position: absolute; inset: 0;
-  background: url("selo.webp?v=2026-11-15-4") center / contain no-repeat;
+  background: url("selo.webp?v=2026-11-15-5") center / contain no-repeat;
 }
 .selo-cima::before { clip-path: polygon(0 0, 100% 0, 100% 50%, 86% 54%, 72% 47%, 57% 55%, 43% 47%, 29% 54%, 15% 47%, 0 52%); }
 .selo-baixo::before { clip-path: polygon(0 52%, 15% 47%, 29% 54%, 43% 47%, 57% 55%, 72% 47%, 86% 54%, 100% 50%, 100% 100%, 0 100%); }
@@ -359,8 +413,10 @@ img { display: block; max-width: 100%; }
 .bolhas circle {
   fill: #fff; opacity: 0;
   transform-box: fill-box; transform-origin: center;
-  animation: bolha 1.5s linear infinite;
+  /* só animam durante o brinde; antes e depois ficam paradas e invisíveis */
+  animation: none 1.5s linear infinite;
 }
+.brindando:not(.puxando) .bolhas circle { animation-name: bolha; }
 /* Cada bolha sobe num ritmo próprio */
 .bolhas circle:nth-child(2) { animation-delay: -.4s;  animation-duration: 1.2s; }
 .bolhas circle:nth-child(3) { animation-delay: -.9s;  animation-duration: 1.7s; }
@@ -381,7 +437,7 @@ img { display: block; max-width: 100%; }
   position: absolute; inset: 0; z-index: 2;
   container-type: inline-size;
   border-radius: 4px; overflow: hidden;
-  background: var(--papel) url("convite.webp?v=2026-11-15-4") center / cover;
+  background: var(--papel) url("convite.webp?v=2026-11-15-5") center / cover;
   box-shadow: var(--elev-1);
   transform: translateY(0) rotate(0) scale(.94);
 }
@@ -412,7 +468,9 @@ img { display: block; max-width: 100%; }
   content: ""; position: absolute; inset: 0; z-index: 0;
   border-radius: 4px; pointer-events: none;
   box-shadow: var(--elev-convite);
-  opacity: 0; transition: opacity 1s var(--ease-out);
+  /* a luz é fixa: quando o convite inclina, a sombra vai para o lado oposto ao do mouse */
+  transform: translate(var(--sx, 0px), var(--sy, 0px));
+  opacity: 0; transition: opacity 1s var(--ease-out), transform var(--dur-slow) var(--ease-out);
 }
 .revelado .cena::after { opacity: 1; }
 /* Brilho que atravessa o convite uma vez, e reflexo que segue o mouse */
@@ -540,7 +598,11 @@ img { display: block; max-width: 100%; }
   --vidro-hover: rgb(228 207 189 / .96);
   background-color: var(--vidro);
   /* reflexo do céu no alto à esquerda (lado da luz) e espessura escura embaixo à direita */
-  background-image: linear-gradient(140deg, rgb(255 255 255 / .55) 0%, rgb(255 255 255 / .12) 42%, transparent 60%, rgb(var(--sombra) / .10) 100%);
+  /* granulado fino de vidro jateado + reflexo do céu no alto à esquerda (lado da luz) e espessura escura embaixo à direita */
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 -.18'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23g)'/%3E%3C/svg%3E"),
+    linear-gradient(140deg, rgb(255 255 255 / .55) 0%, rgb(255 255 255 / .12) 42%, transparent 60%, rgb(var(--sombra) / .10) 100%);
+  background-size: 48px 48px, 100% 100%;
   border: 1px solid rgb(255 255 255 / .7);
   color: var(--bronze-escuro);
   /* vidro: sombra leve e curta; borda clara por dentro, do lado da luz */
@@ -611,7 +673,7 @@ img { display: block; max-width: 100%; }
 /* =========================================================
    Sem JavaScript ou com pouco movimento: convite já aberto
    ========================================================= */
-html:not(.js) .env, html:not(.js) .selo, html:not(.js) .selo-meia, html:not(.js) .dica, html:not(.js) .chamada { display: none; }
+html:not(.js) .env, html:not(.js) .sombra-env, html:not(.js) .selo, html:not(.js) .selo-meia, html:not(.js) .dica, html:not(.js) .chamada { display: none; }
 html:not(.js) .cena { transform: none; }
 html:not(.js) .convite { transform: none; }
 
@@ -619,7 +681,8 @@ html:not(.js) .convite { transform: none; }
    quando a pessoa toca no selo. Param os movimentos contínuos e decorativos. */
 @media (prefers-reduced-motion: reduce) {
   .luzes span, .dica, .botao-icone::after, .bolhas circle, .convite::before { animation: none !important; }
-  .js .palco:not(.abrindo) .cena { animation: none; }
+  .js .palco:not(.abrindo) .cena, .js .palco:not(.abrindo) .sombra-env { animation: none; }
+  .fundo, .luzes, .palco { translate: none; }
 }
 
 /* Mais contraste, quando o sistema pede */

@@ -227,10 +227,33 @@
       convite.style.setProperty("--rx", ((.5 - py) * 7).toFixed(2) + "deg");
       convite.style.setProperty("--mx", (px * 100).toFixed(1) + "%");
       convite.style.setProperty("--my", (py * 100).toFixed(1) + "%");
+      /* A borda que se aproxima de quem olha fica mais alta e projeta mais sombra:
+         a sombra se desloca para o lado oposto ao do mouse */
+      cena.style.setProperty("--sx", ((.5 - px) * 18).toFixed(1) + "px");
+      cena.style.setProperty("--sy", ((.5 - py) * 18).toFixed(1) + "px");
     });
     convite.addEventListener("mouseleave", function () {
       convite.style.setProperty("--rx", "0deg");
       convite.style.setProperty("--ry", "0deg");
+      cena.style.setProperty("--sx", "0px");
+      cena.style.setProperty("--sy", "0px");
+    });
+
+    /* ---------- Profundidade: as camadas se movem com o mouse (ver .fundo, .luzes e .palco no CSS) ---------- */
+    var raiz = document.documentElement, mx = 0, my = 0, pendente = false;
+    function aplicarProfundidade() {
+      raiz.style.setProperty("--px", mx.toFixed(3));
+      raiz.style.setProperty("--py", my.toFixed(3));
+      pendente = false;
+    }
+    window.addEventListener("mousemove", function (e) {
+      mx = e.clientX / window.innerWidth * 2 - 1;
+      my = e.clientY / window.innerHeight * 2 - 1;
+      if (!pendente) { pendente = true; requestAnimationFrame(aplicarProfundidade); }
+    });
+    document.addEventListener("mouseleave", function () {
+      mx = 0; my = 0;
+      if (!pendente) { pendente = true; requestAnimationFrame(aplicarProfundidade); }
     });
   }
 
