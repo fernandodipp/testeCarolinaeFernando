@@ -166,6 +166,10 @@
     };
   }
 
+  /* Fechado no envelope, o convite fica fora do alcance do teclado e do leitor de tela:
+     o Tab não pode parar em links invisíveis. Sem JavaScript, o convite já aparece aberto e acessível */
+  convite.inert = true;
+
   var TOQUE = 930;    // momento em que as bordas das taças se tocam (ms)
   var RACHA = 120;    // o selo racha logo depois do tilintar
   /* Ponto de encontro das bordas: no centro da cena, a cerca de 13,8% da altura (ver .taca no CSS) */
@@ -186,6 +190,9 @@
       respingar(b.x, b.y, 30);
     }, TOQUE);
 
+    /* O selo some: deixa de receber foco */
+    selo.inert = true;
+
     /* 2. O selo racha e a aba abre */
     setTimeout(function () {
       /* A flutuação para aqui. O envelope e a sombra ficam presos no ponto em que estavam
@@ -205,8 +212,11 @@
       palco.classList.add("pronto");
       var c = centro(convite);
       estourar(c.x, c.y, 90, 1.6, c.w, c.h);
-      var link = document.querySelector(".botao");
-      if (link) link.focus({ preventScroll: true });
+      /* Os links do convite passam a existir para o teclado e o leitor de tela.
+         O foco vai para o convite, e o Tab segue a ordem de leitura: data, endereço e botões */
+      convite.inert = false;
+      convite.setAttribute("tabindex", "-1");
+      convite.focus({ preventScroll: true });
     }, TOQUE + RACHA + 4000);
   }
 
