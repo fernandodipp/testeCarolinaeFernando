@@ -242,6 +242,8 @@
   if (ponteiroFino && !poucoMovimento) {
     convite.addEventListener("mousemove", function (e) {
       if (!palco.classList.contains("pronto")) return;
+      /* Sobre um link ou botão, a inclinação congela: o alvo não se mexe enquanto a pessoa mira */
+      if (e.target.closest("a, button")) return;
       var r = convite.getBoundingClientRect();
       var px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
       convite.style.setProperty("--ry", ((px - .5) * 7).toFixed(2) + "deg");
